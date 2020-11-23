@@ -24,7 +24,7 @@ Data: Kaggle "Radar Traffic Data. Traffic data collected from radar sensors depl
 ## Introduction
 Rapport de Machine Learning sur le projet Kaggle Radar Traffic Data.
 
-##Analyse des données
+## Analyse des données
 Chaque radar fournit des données toutes les 15 minutes. Chaque nouvel apport de données par radar correspond à une ligne sur le CSV, incluant : 
  - le nom du radar
  - la position géographique du radar
@@ -43,10 +43,10 @@ Décrire pourquoi on en supprime certaines
 |     |  |    |    |
 
 
-##Démarches mises en oeuvre
+## Démarches mises en oeuvre
 Mettre ici les différentes démarches testées, leurs objectifs, avec un petit résumé de pourquoi nous avons décidé ou non de poursuivre?
 
 
-##Résultats et analyse
+## Résultats et analyse
 
-##Conclusion
+## Conclusion

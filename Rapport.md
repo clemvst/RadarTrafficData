@@ -1,8 +1,7 @@
 
 # Rapport Final - Machine Learning
 
-<img src="images/timelapse_austin.png" style="width:634px;height:403px;">
-<caption><center> Austin Timelapse</center></caption><br>
+<img src="images/timelapse_austin.png" width="634px" height="403px">
 
 Iris Dumeur & Clémence Vast
 

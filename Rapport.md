@@ -1,6 +1,7 @@
 
 # Rapport Final - Machine Learning
 
+<img src="images/timelapse_austin.png" width="634px" height="403px">
 
 Iris Dumeur & Clémence Vast
 
@@ -24,7 +25,7 @@ Data: Kaggle "Radar Traffic Data. Traffic data collected from radar sensors depl
 ## Introduction
 Rapport de Machine Learning sur le projet Kaggle Radar Traffic Data.
 
-##Analyse des données
+## Analyse des données
 Chaque radar fournit des données toutes les 15 minutes. Chaque nouvel apport de données par radar correspond à une ligne sur le CSV, incluant : 
  - le nom du radar
  - la position géographique du radar
@@ -36,3 +37,17 @@ Décrire le nombre d'entités dans les colonnes
 
 Décrire pourquoi on en supprime certaines
 
+
+| Nom de la colonne | Description | Nombre d'entités | Remarques particulieres |
+| ----------------- | ----------- |----------------- | ----------------------- |
+| Location     | Nom du radar, un nom correspond à une localisation précise | 23  |    |
+|     |  |    |    |
+
+
+## Démarches mises en oeuvre
+Mettre ici les différentes démarches testées, leurs objectifs, avec un petit résumé de pourquoi nous avons décidé ou non de poursuivre?
+
+
+## Résultats et analyse
+
+## Conclusion

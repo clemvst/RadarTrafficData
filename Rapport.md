@@ -43,3 +43,10 @@ Décrire pourquoi on en supprime certaines
 |     |  |    |    |
 
 
+##Démarches mises en oeuvre
+Mettre ici les différentes démarches testées, leurs objectifs, avec un petit résumé de pourquoi nous avons décidé ou non de poursuivre?
+
+
+##Résultats et analyse
+
+##Conclusion

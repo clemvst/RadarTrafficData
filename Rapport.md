@@ -43,6 +43,12 @@ Décrire pourquoi on en supprime certaines
 | Location     | Nom du radar, un nom correspond à une localisation précise | 23  |    |
 |     |  |    |    |
 
+On étudie ensuite le comportement des données pour un seul radar : radar1
+
+' CAPITAL OF TEXAS HWY / LAKEWOOD DR'. Deux directions sont disponibles : 
+On étudie le comportenement selon le jour de la semaine : 
+**insérer graph de image repertoire**
+**Analyser graph de image repertoire**
 
 ## Démarches mises en oeuvre
 Mettre ici les différentes démarches testées, leurs objectifs, avec un petit résumé de pourquoi nous avons décidé ou non de poursuivre?

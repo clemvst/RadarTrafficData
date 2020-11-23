@@ -1,0 +1,38 @@
+
+# Rapport Final - Machine Learning
+
+
+Iris Dumeur & Clémence Vast
+
+14/12/2020 - Ecole des Mines de Nancy
+
+## Rappel des consignes
+Data: Kaggle "Radar Traffic Data. Traffic data collected from radar sensors deployed by the City of Austin."
+- Build a deep learning model that predicts the traffic volume.
+- Do not use any other data source ! (in particular, no openstreetmap data...)
+- If dataset too big for your laptop, reduce dataset size
+- You may do it alone, or within a group of 2 (preferred)
+- But you'll get an individual note !
+- Score:
+    - GIT (4): distribution of the workplan, individual contribution
+    - REPORT (10): model(s), experimental process, citations
+    - CODE (6): correctness, readability
+- Use deep learning models
+- Do not spend too much time on data pre-processing
+- Most important: modeling, training, evaluating
+
+## Introduction
+Rapport de Machine Learning sur le projet Kaggle Radar Traffic Data.
+
+##Analyse des données
+Chaque radar fournit des données toutes les 15 minutes. Chaque nouvel apport de données par radar correspond à une ligne sur le CSV, incluant : 
+ - le nom du radar
+ - la position géographique du radar
+ - la date et l’heure de soumission de données (sous différents formats)
+ - la direction de circulation des voitures détectées
+ - le nombre de voitures détectées
+ 
+Décrire le nombre d'entités dans les colonnes
+
+Décrire pourquoi on en supprime certaines
+

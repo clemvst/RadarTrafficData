@@ -39,5 +39,7 @@ Décrire pourquoi on en supprime certaines
 
 | Nom de la colonne | Description | Nombre d'entités | Remarques particulieres |
 | ----------------- | ----------- |----------------- | ----------------------- |
-| Content Cell      | Content Cell  | Content Cell  | Content Cell  |
-| Content Cell      | Content Cell  | Content Cell  | Content Cell  |
+| Location     | Nom du radar, un nom correspond à une localisation précise | 23  |    |
+|     |  |    |    |
+
+

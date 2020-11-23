@@ -46,7 +46,9 @@ Décrire pourquoi on en supprime certaines
 On étudie ensuite le comportement des données pour un seul radar : radar1
 
 ' CAPITAL OF TEXAS HWY / LAKEWOOD DR'. Deux directions sont disponibles : 
-On étudie le comportenement selon le jour de la semaine : 
+On étudie le comportenement selon le jour de la semaine : . On remarque qu'il existe plusieurs données pour un même jour 
+d'une même année à la même heure d'acquisition (**insérer screen ??**). On agrège les données ayant la même exacte date
+d'acquisition.
 **insérer graph de image repertoire**
 **Analyser graph de image repertoire**
 

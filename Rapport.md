@@ -32,6 +32,9 @@ Chaque radar fournit des données toutes les 15 minutes. Chaque nouvel apport de
  - la direction de circulation des voitures détectées
  - le nombre de voitures détectées
  
+To describe the data we first focus on explore the data for one radar : ' CAPITAL OF TEXAS HWY / LAKEWOOD DR'
+
+
 Décrire le nombre d'entités dans les colonnes
 
 Décrire pourquoi on en supprime certaines

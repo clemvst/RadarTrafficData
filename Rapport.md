@@ -39,3 +39,8 @@ Décrire le nombre d'entités dans les colonnes
 
 Décrire pourquoi on en supprime certaines
 
+
+| Nom de la colonne | Description | Nombre d'entités | Remarques particulieres |
+| ----------------- | ----------- |----------------- | ----------------------- |
+| Content Cell      | Content Cell  | Content Cell  | Content Cell  |
+| Content Cell      | Content Cell  | Content Cell  | Content Cell  |

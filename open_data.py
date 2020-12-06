@@ -15,8 +15,15 @@ def open_data(str_csv, direction, radar, year=None):
     if year is not None:
         df = df[df["Year"] == 2018]
     df = df[df["Direction"] == direction]
-    if (radar is not None) | (year is not None):
+    if (radar is not None):
         # aggregate the values if we have data
         df = df.groupby("global_date").agg({"Volume": "sum"}).sort_values("global_date").reset_index()
     return df
+
+
+
+
+
+
+
 

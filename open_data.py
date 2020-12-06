@@ -49,7 +49,7 @@ def create_subd_df(df: pd.DataFrame, begin_day: datetime.date, window_x_day: int
 
 
 def create_global_batch(df, window_x_day: int, window_label_day: int, gap_acquisition: int, tot_len_day=365,
-                        features=None):
+                        features=None): #TODO Features not working yet
     """
     We always think it terms of days
     :param df:

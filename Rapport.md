@@ -33,6 +33,8 @@ Chaque radar fournit des données toutes les 15 minutes. Chaque nouvel apport de
  - la direction de circulation des voitures détectées
  - le nombre de voitures détectées
  
+Au début de notre projet, nous décidons de nous concentrer sur les données provenant d'un seul radar, afin d'avoir moins
+de données à traiter ainsi que 
 To describe the data we first focus on explore the data for one radar : ' CAPITAL OF TEXAS HWY / LAKEWOOD DR'
 
 

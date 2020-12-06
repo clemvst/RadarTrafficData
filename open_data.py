@@ -25,8 +25,7 @@ def open_data(str_csv, direction: str, radar: str, year=None):
     return df
 
 
-def create_subd_df(df: pd.DataFrame, begin_day: datetime.date, window_x_day: int, window_label_day: int) -> Tuple[
-    None, None]:
+def create_subd_df(df: pd.DataFrame, begin_day: datetime.date, window_x_day: int, window_label_day: int) :
     """
     Given a begin date, extract the sub_df of the data for x and y.
     :return:
@@ -68,7 +67,6 @@ def create_global_batch(df, window_x_day: int, window_label_day: int, gap_acquis
     end_period = first_day + timedelta(days=tot_len_day)
     if df["date"].iloc[-1] < end_period:
         end_period = df["date"].iloc[-1]
-    last_seen_day = first_day
     batch_df = pd.DataFrame(columns=columns_name)
     i = 0
     while first_day < end_period - timedelta(days=window_label_day + window_x_day):
@@ -81,7 +79,6 @@ def create_global_batch(df, window_x_day: int, window_label_day: int, gap_acquis
                                     window_label_day=window_label_day)
         first_day = first_day + timedelta(days=gap_acquisition)
         if df_x is not None: # ensure that we have data for all the dates
-
             dic_data = {"vol_data_x": df_x["Volume"].to_numpy(), "vol_label_y": df_y["Volume"].to_numpy()}
             if features is not None:
                 # features should fit with the df_x column name

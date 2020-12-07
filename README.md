@@ -11,3 +11,8 @@ Install Anaconda
  `python -m ipykernel install --user --name=dl_env` to add the configurated env as a jupyter kernel
  
  
+##TODO : 
+
+- We need to have a bit more data, check the open_data file . And set to 0 when only a few data are missing.
+But if the whole day is missing : do something else
+- Check with a more complex task if the training still works

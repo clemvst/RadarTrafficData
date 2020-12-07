@@ -2,7 +2,7 @@ import datetime
 from datetime import timedelta
 import pandas as pd
 from typing import Tuple
-
+import numpy as np
 
 def open_data(str_csv, direction: str, radar: str, year=None):
     """
@@ -25,7 +25,7 @@ def open_data(str_csv, direction: str, radar: str, year=None):
     return df
 
 
-def create_subd_df(df: pd.DataFrame, begin_day: datetime.date, window_x_day: int, window_label_day: int) :
+def create_subd_df(df: pd.DataFrame, begin_day: datetime.date, window_x_day: int, window_label_day: int):
     """
     Given a begin date, extract the sub_df of the data for x and y.
     :return:
@@ -36,22 +36,23 @@ def create_subd_df(df: pd.DataFrame, begin_day: datetime.date, window_x_day: int
     df_x = df.loc[(df["date"] < end_x_window) & (df["date"] >= begin_day)]
     df_label = df.loc[(df["date"] < end_label_window) & (df["date"] >= end_x_window)]
     # we need to check that we have data for all the dates :
-    if len(df_x["date"].unique()) != window_x_day:
-        print("We do not have all the dates for the time period in x , {} {}".format(window_x_day, df_x["date"].unique()))
+    #TODO keep the criteria for having all the days thus it is the criteria of df["date"–=window_size for example
+    #TODO once this check is done if the vectors does not have the regular legnth which is 24*4*window then set to 0 the missing value
+    if len(df_x["global_date"].unique()) != window_x_day*24*4:
+        print("We do not have all the dates for the time period in x , {} {}".format(window_x_day*24*4, len(df_x["global_date"].unique())))
         return None, None
-    elif len(df_label["date"].unique()) != window_label_day:
-        print("We do not have all the dates for the time period in label , {} {}".format(window_label_day,
-                                                                                     df_label["date"].unique()))
+    elif len(df_label["global_date"].unique()) != window_label_day*24*4:
+        print("We do not have all the dates for the time period in label , {} {}".format(window_label_day*24*4,
+                                                                                     len(df_label["global_date"].unique())))
         return None, None
     else:
-        # print(df_label)
         return df_x, df_label
 
 
 def create_global_batch(df, window_x_day: int, window_label_day: int, gap_acquisition: int, tot_len_day=365,
                         features=None): #TODO Features not working yet
     """
-    We always think it terms of days
+    We always think in terms of days
     :param df:
     :param window_x_day:
     :param window_label_day:
@@ -79,12 +80,26 @@ def create_global_batch(df, window_x_day: int, window_label_day: int, gap_acquis
                                     window_label_day=window_label_day)
         first_day = first_day + timedelta(days=gap_acquisition)
         if df_x is not None: # ensure that we have data for all the dates
-            dic_data = {"vol_data_x": df_x["Volume"].to_numpy(), "vol_label_y": df_y["Volume"].to_numpy()}
+            dic_data = {columns_name[0]: df_x["Volume"].to_numpy(), columns_name[1]: df_y["Volume"].to_numpy()}
             if features is not None:
                 # features should fit with the df_x column name
                 assert features in df_x.columns, "Cannot add the features {} as it is not in the sub_df_x cols " \
                                                  "{}".format(features, df_x.columns)
                 dic_data.update({features: df_x[features]})
             batch_df = batch_df.append(dic_data, ignore_index=True)
-    i += 1
+            i += 1
     return batch_df
+
+def get_df_stats(df, columns=None):
+    """ return mean and std for the columns"""
+    if columns is None:
+        columns = ["vol_data_x", "vol_label_y"]
+    dic = {}
+    global_mean = 0
+    global_std = 0
+    for name in columns:
+        df["{}_mean".format(name)] = df[name].apply(lambda x: np.mean(x))
+        df["{}_std".format(name)] = df[name].apply(lambda x: np.std(x))
+        global_mean += df["{}_std".format(name)].mean()
+        global_std += df["{}_std".format(name)].std()
+    return global_mean / len(columns), global_std / len(columns)

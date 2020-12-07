@@ -25,7 +25,7 @@ def open_data(str_csv, direction: str, radar: str, year=None):
     return df
 
 
-def create_subd_df(df: pd.DataFrame, begin_day: datetime.date, window_x_day: int, window_label_day: int) :
+def create_subd_df(df: pd.DataFrame, begin_day: datetime.date, window_x_day: int, window_label_day: int):
     """
     Given a begin date, extract the sub_df of the data for x and y.
     :return:
@@ -44,14 +44,13 @@ def create_subd_df(df: pd.DataFrame, begin_day: datetime.date, window_x_day: int
                                                                                      df_label["date"].unique()))
         return None, None
     else:
-        # print(df_label)
         return df_x, df_label
 
 
 def create_global_batch(df, window_x_day: int, window_label_day: int, gap_acquisition: int, tot_len_day=365,
                         features=None): #TODO Features not working yet
     """
-    We always think it terms of days
+    We always think in terms of days
     :param df:
     :param window_x_day:
     :param window_label_day:
@@ -79,12 +78,12 @@ def create_global_batch(df, window_x_day: int, window_label_day: int, gap_acquis
                                     window_label_day=window_label_day)
         first_day = first_day + timedelta(days=gap_acquisition)
         if df_x is not None: # ensure that we have data for all the dates
-            dic_data = {"vol_data_x": df_x["Volume"].to_numpy(), "vol_label_y": df_y["Volume"].to_numpy()}
+            dic_data = {columns_name[0]: df_x["Volume"].to_numpy(), columns_name[1]: df_y["Volume"].to_numpy()}
             if features is not None:
                 # features should fit with the df_x column name
                 assert features in df_x.columns, "Cannot add the features {} as it is not in the sub_df_x cols " \
                                                  "{}".format(features, df_x.columns)
                 dic_data.update({features: df_x[features]})
             batch_df = batch_df.append(dic_data, ignore_index=True)
-    i += 1
+            i += 1
     return batch_df

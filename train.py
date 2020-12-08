@@ -5,13 +5,19 @@ import numpy as np
 from typing import Tuple
 
 
-def train(model, trainloader, valloader, lr, n_epochs, device=None,ite_print=10) -> Tuple[list, list, list]:
+def train(model, trainloader, valloader, lr: float, n_epochs: int, device=None,ite_print=10) -> Tuple[list, list, list]:
     """
+    Trains a chosen model with given training and validation datasets and hyperparameters
+    
     :param model: a toch model
+    :param trainloader:
+    :param valloader:
     :param lr: learning rate, float
     :param n_epochs: number of epochs
-    :param device:
-    :return:
+    :param device: cuda or cpu
+    :param ite_print: path of iterations to print (ex: print every 5 epochs)
+    
+    :return: tuple with list of epochs iterations, list of train loss values, list of val loss values
 
     """
     if device is None:
@@ -37,7 +43,6 @@ def train(model, trainloader, valloader, lr, n_epochs, device=None,ite_print=10)
             optimizer.step()
 
         if i % ite_print == 1:
-            # print(f'epoch: {i:3} loss: {single_loss.item():10.8f}')
             loss_val_l = []
             for seqval, labelval in valloader:  # maybe change the batch size of val an we avoid using a for loop ?
                 xval, yval = seqval.to(device, dtype=torch.long), labelval.to(device, dtype=torch.long)
@@ -51,5 +56,5 @@ def train(model, trainloader, valloader, lr, n_epochs, device=None,ite_print=10)
             loss_train_list += [single_loss.item()]
             loss_val_list += [np.mean(loss_val_l)]
             print("epoch {} loss train {} loss val {}".format(i, single_loss.data, np.mean(loss_val_l)))
-        # print(f'epoch: {i:3} loss: {single_loss.item():10.10f}')
+            
     return iteration,loss_train_list,loss_val_list

@@ -16,3 +16,5 @@ Install Anaconda
 - We need to have a bit more data, check the open_data file . And set to 0 when only a few data are missing.
 But if the whole day is missing : do something else
 - Check with a more complex task if the training still works
+- Build the test-predictions function
+- Play with hyperparameters

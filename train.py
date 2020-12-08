@@ -5,7 +5,7 @@ import numpy as np
 from typing import Tuple
 
 
-def train(model, trainloader, valloader, lr: float, n_epochs: int, device=None,ite_print=10) -> Tuple[list, list, list]:
+def train(model, trainloader, valloader, lr: float, n_epochs: int, name_model="model", device=None, ite_print=10) -> Tuple[list, list, list]:
     """
     Trains a chosen model with given training and validation datasets and hyperparameters
     
@@ -27,6 +27,8 @@ def train(model, trainloader, valloader, lr: float, n_epochs: int, device=None,i
     iteration = []
     loss_train_list = []
     loss_val_list = []
+    best_val_loss = 20.0
+    bad_epochs = 0
     for i in range(n_epochs):
         for seq, labels in trainloader:
             x, y = seq.to(device, dtype=torch.long), labels.to(device, dtype=torch.long)
@@ -57,4 +59,15 @@ def train(model, trainloader, valloader, lr: float, n_epochs: int, device=None,i
             loss_val_list += [np.mean(loss_val_l)]
             print("epoch {} loss train {} loss val {}".format(i, single_loss.data, np.mean(loss_val_l)))
             
+            if loss_val.data < best_val_loss:
+                torch.save(model, name_model + ".pt")
+                best_val_loss = loss_val.data
+                bad_epochs = 0
+
+            else:
+                bad_epochs += 1
+
+            if bad_epochs == 10:
+                break
+
     return iteration,loss_train_list,loss_val_list

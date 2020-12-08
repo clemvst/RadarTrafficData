@@ -34,14 +34,35 @@ def open_data(str_csv, direction: str, radar: str, year=None):
     return df
 
 
+def fill_missing_times(df: pd.DataFrame) -> pd.DataFrame:
+    
+    """
+    Adds missing times to the given window df
+    """
+    all_times = pd.date_range(df["global_date"].min(), df["global_date"].max(), freq='15min')
+    df.index = pd.DatetimeIndex(df['global_date'])
+    df = df.reindex(all_times)
+    df.drop(columns=["index", "global_date"], inplace=True)
+    df.index = df.index.set_names(['global_date']) # maybe useless line
+    df['global_date'] = df.index
+    df["Volume"].fillna(0, inplace=True)
+    df.fillna(method = "ffill", inplace=True) 
+    # TODO : changer ça et plutot fill avec les dates extraites des autres columns au bon format
+    
+    return df
+    
+
+
 def create_subd_df(
-    df: pd.DataFrame, begin_day: datetime.date, window_x_day: int, window_label_day: int
+    df: pd.DataFrame, begin_day: datetime.date, window_x_day: int, window_label_day: int, err_rate: int = 0.02
 ):
     """
     Given a begin date, extract the sub_df of the data for x and y.
     :return:
     the sub DataFrame for x, the sub DataFrame for label
     """
+    allowed_error = round(24 * 4 * err_rate)
+    
     end_x_window = begin_day + timedelta(days=window_x_day)
     end_label_window = end_x_window + timedelta(days=window_label_day)
     df_x = df.loc[(df["date"] < end_x_window) & (df["date"] >= begin_day)]
@@ -54,8 +75,8 @@ def create_subd_df(
 
     if len(df_x["date"].unique()) != window_x_day or len(df_label["date"].unique()) != window_label_day:
         return None, None
-    
-    if window_x_day * 24 * 4 - len(df_x["global_date"].unique()) > 10 :
+
+    if window_x_day * 24 * 4 - len(df_x["global_date"].unique()) > allowed_error*window_x_day :
 
         print(
             "We do not have all the dates for the time period in x , {} {}".format(
@@ -64,15 +85,15 @@ def create_subd_df(
         )
         return None, None    
     
-    all_times_x = pd.date_range(df_x["global_date"].min(), df_x["global_date"].max(), freq='15min')
-    df_x.index = pd.DatetimeIndex(df_x['global_date'])
-    df_x = df_x.reindex(all_times_x)
-    df_x.drop(columns=["index", "global_date"], inplace=True)
-    df_x.index = df_x.index.set_names(['global_date'])
-    df_x['global_date'] = df_x.index
-    df_x["Volume"].fillna(0, inplace=True)
-    df_x.fillna(method = "ffill", inplace=True) 
-    # TODO : changer ça et plutot fill avec les dates extraites des autres columns au bon format
+    if window_label_day*24*4 - len(df_label["global_date"].unique()) > allowed_error*window_label_day :
+        print("We do not have all the dates for the time period in label , {} {}".format(window_label_day*24*4,
+                                                                                     len(df_label["global_date"].unique())))
+        return None, None
+    
+    ## filter and fill missing times
+    df_x = fill_missing_times(df_x)
+    df_label = fill_missing_times(df_label)
+    
     return df_x, df_label
 
 

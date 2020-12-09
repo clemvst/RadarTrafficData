@@ -34,8 +34,7 @@ class lstm_encoder(nn.Module):
         :                              element in the sequence
         '''
 
-        lstm_out, self.hidden = self.lstm(x_input.view(x_input.shape[0], x_input.shape[1], self.input_size))
-
+        lstm_out, self.hidden = self.lstm(x_input.view(x_input.shape[1], x_input.shape[0],-1)) #TODO check
         return lstm_out, self.hidden
 
     def init_hidden(self, batch_size):
@@ -67,7 +66,7 @@ class lstm_decoder(nn.Module):
 
         self.lstm = nn.LSTM(input_size=input_size, hidden_size=hidden_size,
                             num_layers=num_layers)
-        self.linear = nn.Linear(hidden_size, input_size)
+        self.linear = nn.Linear(hidden_size, input_size) #TODO I do not understand this dimensions
 
     def forward(self, x_input, encoder_hidden_states):
         '''
@@ -143,7 +142,7 @@ class lstm_wrapper(nn.Module):
 
 
     def train_model(self, trainloader, n_epochs, target_len, batch_size, teacher_forcing_ratio=0.5,
-                    learning_rate=0.01,save=False,name_model="model"):
+                    learning_rate=0.01,save=False,name_model="model",nfeatures=1):
 
         '''
         This model  is taken from https://github.com/lkulowski/LSTM_encoder_decoder/blob/master/code/lstm_encoder_decoder.py
@@ -183,8 +182,8 @@ class lstm_wrapper(nn.Module):
                 batch_loss = 0.
                 batch_size=0
                 for input_batch,target_batch in trainloader:
-                    input_batch=input_batch.unsqueeze(1)
-                    #target_batch = input_batch.unsqueeze(1)
+                    #input_batch=input_batch.unsqueeze(0) #dimension should be (batch_size,feature,seq_len)
+                    #target_batch = input_batch.unsqueeze(0)
                     print("input",input_batch.shape)
                     print("target",target_batch.shape)
                     batch_size+=1
@@ -193,7 +192,7 @@ class lstm_wrapper(nn.Module):
                     #target_batch = target_tensor[:, b: b + batch_size, :]
 
                     # outputs tensor
-                    outputs = torch.zeros(target_len, batch_size) #TODO MODIFY IF FEATURES
+                    outputs = torch.zeros(batch_size,nfeatures,target_len) #TODO MODIFY IF FEATURES
 
                     # initialize hidden state
                     encoder_hidden = self.encoder.init_hidden(batch_size) #TODO understand this line I have seen
@@ -205,22 +204,26 @@ class lstm_wrapper(nn.Module):
                     encoder_output, encoder_hidden = self.encoder(input_batch)
 
                     # decoder with teacher forcing
-                    decoder_input = input_batch[-1, :, :]  # shape: (batch_size, input_size)
+                    decoder_input = input_batch[:, :,-1]  # shape: (batch_size, nfeatures,seq_len)
                     decoder_hidden = encoder_hidden
 
                     # use teacher forcing
                     if random() < teacher_forcing_ratio:
                         for t in range(target_len):
                             decoder_output, decoder_hidden = self.decoder(decoder_input, decoder_hidden)
-                            outputs[t] = decoder_output
-                            decoder_input = target_batch[t, :, :]
+                            print(outputs.shape)
+                            print(decoder_output.shape)
+                            outputs[:,:,t] = decoder_output
+                            decoder_input = target_batch[:,:,t]
 
                     # predict recursively
                     else:
                         for t in range(target_len):
                             decoder_output, decoder_hidden = self.decoder(decoder_input, decoder_hidden)
-                            outputs[t] = decoder_output
-                            decoder_input = decoder_output
+                            print(outputs.shape)
+                            print(decoder_output.shape)
+                            outputs[:,:,t] = decoder_output
+                            decoder_input = decoder_output[:,:,t]
 
 
                     # compute the loss

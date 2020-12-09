@@ -12,20 +12,11 @@ class LSTM(nn.Module):
 
         self.linear = nn.Linear(hidden_size, output_size)
 
-        self.hidden_cell = (torch.zeros(1, 1, self.hidden_size),
-                            torch.zeros(1, 1, self.hidden_size))
+        self.hidden_cell = (torch.zeros(1, 1, hidden_size),
+                            torch.zeros(1, 1, hidden_size))
 
     def forward(self, input_seq):
         lstm_out, self.hidden_cell = self.lstm(input_seq.view(len(input_seq), 1, -1), self.hidden_cell)
         predictions = self.linear(lstm_out.view(len(input_seq), -1))
         return predictions[-1]
 
-    def init_hidden(self, batch_size):
-        '''
-        initialize hidden state
-        : param batch_size:    x_input.shape[1]
-        : return:              zeroed hidden state and cell state
-        '''
-
-        return (torch.zeros(self.num_layers, batch_size, self.hidden_size),
-                torch.zeros(self.num_layers, batch_size, self.hidden_size))

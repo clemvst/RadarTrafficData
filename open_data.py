@@ -97,68 +97,6 @@ def create_subd_df(
     return df_x, df_label
 
 
-# def create_global_batch(
-#     df: pd.DataFrame,
-#     window_x_day: int,
-#     window_label_day: int,
-#     gap_acquisition: int,
-#     tot_len_day=365,
-#     features=None,
-# ):
-#     # TODO Features not working yet
-#     """
-#     We always think in terms of days
-#     :param df:
-#     :param window_x_day:
-#     :param window_label_day:
-#     :param gap_acquisition:
-#     :param tot_len_day:
-#     :param features: To implement
-#     :return:
-#     """
-#     columns_name = ["vol_data_x", "vol_label_y"]
-#     df = df.sort_values(
-#         "global_date"
-#     ).reset_index()  # we ensure that the data frame is created by time
-#     first_day = df["date"].iloc[0] + timedelta(
-#         days=1
-#     )  # Sometimes in the first day the acquisition does start at midnight. But will be ok for the second day
-#     end_period = first_day + timedelta(days=tot_len_day)
-#     if df["date"].iloc[-1] < end_period:
-#         end_period = df["date"].iloc[-1]
-#     batch_df = pd.DataFrame(columns=columns_name)
-#     i = 0
-#     while first_day < end_period - timedelta(days=window_label_day + window_x_day):
-#         print(
-#             "Building batch {} \n x begin {} label begin {} end period {} ".format(
-#                 i,
-#                 first_day,
-#                 first_day + timedelta(days=window_x_day),
-#                 end_period - timedelta(days=window_label_day + window_x_day),
-#             )
-#         )
-#         df_x, df_y = create_subd_df(
-#             df,
-#             begin_day=first_day,
-#             window_x_day=window_x_day,
-#             window_label_day=window_label_day,
-#         )
-#         first_day = first_day + timedelta(days=gap_acquisition)
-#         if df_x is not None:  # ensure that we have data for all the dates
-#             dic_data = {
-#                 columns_name[0]: df_x["Volume"].to_numpy(),
-#                 columns_name[1]: df_y["Volume"].to_numpy(),
-#             }
-#             if features is not None:
-#                 # features should fit with the df_x column name
-#                 assert features in df_x.columns, (
-#                     "Cannot add the features {} as it is not in the sub_df_x cols "
-#                     "{}".format(features, df_x.columns)
-#                 )
-#                 dic_data.update({features: df_x[features]})
-#             batch_df = batch_df.append(dic_data, ignore_index=True)
-#             i += 1
-#     return batch_df
 
 
 def create_global_batch(

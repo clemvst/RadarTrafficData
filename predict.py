@@ -20,11 +20,11 @@ def predict(path_model: str, testloader, device=None) -> Tuple[list, list, list]
     mse_list = []
     gt = []
     for seq, labels in testloader:
-        x, y = seq.to(device, dtype=torch.long), labels.to(device, dtype=torch.long)
-        y_pred = model(x.float())
-        loss_val = loss_function(y_pred.float(), y.float())
+        #x, y = seq.to(device, dtype=torch.long), labels.to(device, dtype=torch.long)
+        y_pred = model(seq.float())
+        loss_val = loss_function(y_pred.float(), labels.float())
         prediction += [y_pred]
-        gt += [y]
+        gt += [labels]
         mse_list += [loss_val.data]
 
     return prediction, gt, mse_list

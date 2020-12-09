@@ -41,7 +41,7 @@ class RadarCollate(object):
         for _data, _label in batch:
             data_list.append(_data)
             label_list.append(_label)
-        return torch.Tensor(data_list), torch.LongTensor(label_list)
+        return torch.Tensor(data_list), torch.Tensor(label_list)
 
     def __call__(self, batch):
         return self._collate_fn(batch)

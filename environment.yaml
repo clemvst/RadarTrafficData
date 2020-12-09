@@ -13,3 +13,5 @@ dependencies:
   - scikit-learn
   - geopandas
   - jupyterlab
+  - pip:
+      - torchsummary

@@ -24,9 +24,9 @@ def open_data(str_csv, direction: str, radar: str, year=None):
     df = df.loc[df["Direction"] == direction]
     df = (
         df.groupby("global_date")
-            .agg({"Volume": "sum", "Day of Week": lambda x: list(set(x))[0]})
-            .sort_values("global_date")
-            .reset_index()
+        .agg({"Volume": "sum", "Day of Week": lambda x: list(set(x))[0]})
+        .sort_values("global_date")
+        .reset_index()
     )
     df["date"] = df.apply(
         lambda x: x.global_date.date(), axis=1
@@ -35,6 +35,7 @@ def open_data(str_csv, direction: str, radar: str, year=None):
 
 
 def fill_missing_times(df: pd.DataFrame) -> pd.DataFrame:
+
     """
     Adds missing times to the given window df
     """
@@ -42,17 +43,18 @@ def fill_missing_times(df: pd.DataFrame) -> pd.DataFrame:
     df.index = pd.DatetimeIndex(df['global_date'])
     df = df.reindex(all_times)
     df.drop(columns=["index", "global_date"], inplace=True)
-    df.index = df.index.set_names(['global_date'])  # maybe useless line
+    df.index = df.index.set_names(['global_date']) # maybe useless line
     df['global_date'] = df.index
     df["Volume"].fillna(0, inplace=True)
-    df.fillna(method="ffill", inplace=True)
+    df.fillna(method = "ffill", inplace=True)
     # TODO : changer ça et plutot fill avec les dates extraites des autres columns au bon format
 
     return df
 
 
+
 def create_subd_df(
-        df: pd.DataFrame, begin_day: datetime.date, window_x_day: int, window_label_day: int, err_rate: int = 0.02
+    df: pd.DataFrame, begin_day: datetime.date, window_x_day: int, window_label_day: int, err_rate: int = 0.02
 ):
     """
     Given a begin date, extract the sub_df of the data for x and y.
@@ -74,7 +76,8 @@ def create_subd_df(
     if len(df_x["date"].unique()) != window_x_day or len(df_label["date"].unique()) != window_label_day:
         return None, None
 
-    if window_x_day * 24 * 4 - len(df_x["global_date"].unique()) > allowed_error * window_x_day:
+    if window_x_day * 24 * 4 - len(df_x["global_date"].unique()) > allowed_error*window_x_day :
+
         print(
             "We do not have all the dates for the time period in x , {} {}".format(
                 window_x_day * 24 * 4, len(df_x["global_date"].unique())
@@ -82,10 +85,9 @@ def create_subd_df(
         )
         return None, None
 
-    if window_label_day * 24 * 4 - len(df_label["global_date"].unique()) > allowed_error * window_label_day:
-        print("We do not have all the dates for the time period in label , {} {}".format(window_label_day * 24 * 4,
-                                                                                         len(df_label[
-                                                                                                 "global_date"].unique())))
+    if window_label_day*24*4 - len(df_label["global_date"].unique()) > allowed_error*window_label_day :
+        print("We do not have all the dates for the time period in label , {} {}".format(window_label_day*24*4,
+                                                                                     len(df_label["global_date"].unique())))
         return None, None
 
     ## filter and fill missing times
@@ -160,12 +162,12 @@ def create_subd_df(
 
 
 def create_global_batch(
-        df: pd.DataFrame,
-        window_x_day: int,
-        window_label_day: int,
-        gap_acquisition: int,
-        tot_len_day=365,
-        features=None,
+    df: pd.DataFrame,
+    window_x_day: int,
+    window_label_day: int,
+    gap_acquisition: int,
+    tot_len_day=365,
+    features=None,
 ):
     # TODO Features not working yet
     """
@@ -223,24 +225,25 @@ def create_global_batch(
     return batch_df
 
 
-def get_df_stats(df, columns=None):
+
+
+def get_df_stats(df,columns=None):
     """ return mean and std for the columns"""
     if columns is None:
-        columns = ["vol_data_x", "vol_label_y"]
-    global_mean = 0
-    global_std = 0
+        columns=["vol_data_x","vol_label_y"]
+    global_mean=0
+    global_std=0
     for name in columns:
-        df["{}_min".format(name)] = df[name].apply(lambda x: np.min(x))
-        df["{}_max".format(name)] = df[name].apply(lambda x: np.max(x))
-        global_mean += df["{}_min".format(name)].min()
-        global_std += df["{}_max".format(name)].max()
-    return global_mean / len(columns), global_std / len(columns)
+        df["{}_min".format(name)]=df[name].apply(lambda x : np.min(x))
+        df["{}_max".format(name)]=df[name].apply(lambda x : np.max(x))
+        global_mean+=df["{}_min".format(name)].min()
+        global_std+=df["{}_max".format(name)].max()
+    return global_mean/len(columns),global_std/len(columns)
 
-
-def apply_norm(df, mini, maxi, columns=None):
+def apply_norm(df,mini,maxi,columns=None):
     """ apply std"""
     if columns is None:
-        columns = ["vol_data_x", "vol_label_y"]
+        columns=["vol_data_x","vol_label_y"]
     for name in columns:
-        df["{}_norm".format(name)] = df[name].apply(lambda x: (x - mini) / (maxi - mini))
+        df["{}_norm".format(name)]=df[name].apply(lambda x : (x-mini)/(maxi-mini))
     return df

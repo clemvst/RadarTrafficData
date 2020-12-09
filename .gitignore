@@ -1,4 +1,5 @@
 /models/model1.pt
 /models/model2.pt
 **/*.pt
+*.pt
 

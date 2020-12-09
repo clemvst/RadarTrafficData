@@ -25,17 +25,18 @@ Data: Kaggle "Radar Traffic Data. Traffic data collected from radar sensors depl
 ## Introduction
 Rapport de Machine Learning sur le projet Kaggle Radar Traffic Data.
 
-## Analyse des données
+
+
+## Méthodes
+
+### Analyse des données
+
 Chaque radar fournit des données toutes les 15 minutes. Chaque nouvel apport de données par radar correspond à une ligne sur le CSV, incluant : 
  - le nom du radar
  - la position géographique du radar
  - la date et l’heure de soumission de données (sous différents formats)
  - la direction de circulation des voitures détectées
  - le nombre de voitures détectées
- 
-Au début de notre projet, nous décidons de nous concentrer sur les données provenant d'un seul radar, afin d'avoir moins
-de données à traiter et un modèle plus simple à entrainier.
-To describe the data we first focus on explore the data for one radar : ' CAPITAL OF TEXAS HWY / LAKEWOOD DR'
 
 
 Décrire le nombre d'entités dans les colonnes
@@ -55,44 +56,75 @@ Décrire pourquoi on en supprime certaines
 | Direction | None, NB ou *** , indique la direction du passage des voitures compté par le radar |    |    |
 | Volume| Nombre refletant le passage des voitures au niveau du radar entre deux instants|    |    |
 
-On étudie ensuite le comportement des données pour un seul radar : radar1
+Nous remarquons également des irrégularités pour des données, il est possible que certaines données manque. Ils existent de temps en temps pour un même radar, dans la même direction, à la même exacte heure deux données de volume différentes. Dans ce cas là nous sommerons les deux volumes obtenues. Par ailleurs, il peut arriver que les données manquent totalement sur une journée ou bien juste le temps d'une acquisition (il y aura alors une différence de 30 minutes entre deux acquisition). Travaillant avec des données temporelles, nous souhaitons avoir exactement le même échantillonage des données, ce qui nous menera à faire l'algorithme suivant de sélection des données : 
 
-' CAPITAL OF TEXAS HWY / LAKEWOOD DR'. Deux directions sont disponibles 
-On étudie le comportenement selon le jour de la semaine : . On remarque qu'il existe plusieurs données pour un même jour 
+** Décrire l'algorithme, éventuellement, avec un schéma **
+
+IMPORTANT Expliquer que volume est la variable d'intérêt, et quels autres variables pourraient servir comme feautures à ajouter ex: Day of the Week, Mois de l'année
+
+#### Visualisation des données
+
+Nous étudions ensuite les données pour un seul radar :  ' CAPITAL OF TEXAS HWY / LAKEWOOD DR' en direction NB. nous souhaitons rapidement, étudier une probable périodicité journalière des données
+
 d'une même année à la même heure d'acquisition (**insérer screen ??**). On agrège les données ayant la même exacte date
 d'acquisition.
 **insérer graph de image repertoire**
 **Analyser graph de image repertoire**
 
 ##Préparer les données
-Le traitement des données a été fait de manière à pouvoir choisir la taille des données en entrée du modèle ainsi que 
-les labels. Nous souhaitons expérimenter sur différentes échelles, par exemple nous mennerons
-comme expérience : 
+Le traitement des données a été fait de manière à pouvoir choisir la taille des données (input) en entrée et à prédire (label). Les différentes possibilités de construction de dataset, nous mènent à attribuer un identifiant pour chaque dataset construit. Nous utiliserons cette notation lors de la présentation des résultats.
 
-| Taille total du dataset   | Taille input x  | Taille label y  | 
-| ----------------- |  ----------------- | ----------- |
-| 1 mois  | 6 jours de données | 1 jours de données| 
-| 1 an  | 6 jours de données | 1 jours de données| 
-| 1 an | 1 semaine de données| 1 mois de données | 
-
-Afin de rendre ces expériences rapidement implémentables, les fonctions du fichier open_data sont
-fortement paramétrables. Par ailleurs sachant que les acquisitions sont faites toutes les 15 minutes, nous
-souhaitons également choisir en fonction du dataset que l'on souhaite construire l'écart temporel
-entre chaque données du dataset.
-De plus, il est également possible que des données ne soient pas disponibles pour certains jours. Nous ne construisons 
-alors pas les batch dépendant de ces données.
+| Identifiant du dataset | Nombre de radar | Direction | Taille total du dataset   | Taille input x en jour | Taille label y  | Nombre d'élément dans le dataset |
+| ----------------- |  ----------------- | ----------- | ----------- | ----------- | ----------- | ----------- |
+| Dataset0 |  |  | 1 an (2018) | 7 jours de données | 1 jours de données| |
+|  |  |  | 1 an (2018) | 7 jours de données | 7 jours de données |  |
+|  |  |  | ** | 1 mois de données | 1 semaine de données |  |
 
 
 
-## Démarches mises en oeuvre
-Mettre ici les différentes démarches testées, leurs objectifs, avec un petit résumé de pourquoi nous avons décidé ou non de poursuivre?
+### Réseaux de neurones utilisés
 
-Dans notre démarche nous souhaitons partir du modèle simple possible, et le complexifier en fonction des résultats obtenus
-sur le premier modèle simple. 
+#### LSTM-simple
 
-Pour complexifier le modèle regarder : https://towardsdatascience.com/encoder-decoder-model-for-multistep-time-series-forecasting-using-pytorch-5d54c6af6e60
- Prend en compte des features supplémentaire pour la prédiction. Ici pourrait être envisagé par exemple pour ajouter le jour de la semaine
- 
+Le premier modèle repose sur le module LSTM 
+
+Inclure description schéma
+
+Hyper-paramètres qu'on a choisit
+
+ce modèle a été facile à implémenter et à tester, cependant il manque de finesse. Tout d'abord l'inclusion de features n'est pas prévu. 
+
+#### Encoder-decoder
+
+Un second modèle a été implémenté pour pouvoir répondre aux problèmes précédents. Connu pour son utilisation et son efficacité lors du traitement de time series, AJOUTER QQL SOURCES
+
+Le modèle encoder-decoder repose l'association de deux modèles : encoder/decoder. ![](/Users/iris/Code/RadarTrafficData/image/encoder_decoder.png)
+
+[Image de *Video Prediction using Deep Learning and PyTorch (-lightning)* article](https://towardsdatascience.com/video-prediction-using-convlstm-with-pytorch-lightning-27b195fd21a2)
+
+Explication du modèle
+
+Expliquer le principe du teacher forcing
+
+
+
+##### Ajout de features
+
+![](/Users/iris/Code/RadarTrafficData/image/encode_decoder_features.png)
+
+[Image de l'article *Encoder-Decoder Model for Multistep Time Series Forecasting Using PyTorch*  provenant de Towardsdatascience](https://towardsdatascience.com/encoder-decoder-model-for-multistep-time-series-forecasting-using-pytorch-5d54c6af6e60)
+
+#### Métriques utilisées, mesure de la qualité de la performances de l'algorithme
+
+
+
+Parler MSE, ajouter l'équation
+
+Truc avec intervalle à 95%, montrer la loss qui fait ça 
+
+## Résultats
+
+
 
 ## Résultats et analyse
 

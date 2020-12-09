@@ -13,8 +13,14 @@ Install Anaconda
  
 ##TODO : 
 
-- We need to have a bit more data, check the open_data file . And set to 0 when only a few data are missing.
-But if the whole day is missing : do something else
 - Check with a more complex task if the training still works
-- Build the test-predictions function
-- Play with hyperparameters
+-Add features use in the encoder/decoder model for that check : 
+- Look for the more complex model encoder-decoder. The model implemented is a seq2seq. Thus the input
+sequence and the sequence to predict have the same dimension. There is some solutions to be able to predict
+on a sequence which does not have the same size as the input data, I have seen solution in Keras. With Repeat Vector
+(https://machinelearningmastery.com/lstm-autoencoders/)
+Check if it is easey to implement otherwise maybe let's focus on the features adding.
+-Features : 
+https://github.com/gautham20/pytorch-ts/tree/master/ts_models
+https://towardsdatascience.com/encoder-decoder-model-for-multistep-time-series-forecasting-using-pytorch-5d54c6af6e60
+https://pytorch.org/tutorials/intermediate/seq2seq_translation_tutorial.html

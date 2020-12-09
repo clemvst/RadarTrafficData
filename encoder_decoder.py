@@ -4,6 +4,7 @@ import torch
 import torch.nn as nn
 from torch import optim
 import torch.nn.functional as F
+from tqdm import trange
 
 class lstm_encoder(nn.Module):
     ''' Encodes time-series sequence '''
@@ -87,7 +88,7 @@ class lstm_decoder(nn.Module):
 class lstm_wrapper(nn.Module):
     ''' train LSTM encoder-decoder and make predictions '''
 
-    def __init__(self, input_size, hidden_size):
+    def __init__(self, input_size, hidden_size,target_len=96,teacher_forcing_ratio=0.3):
         '''
         : param input_size:     the number of expected features in the input X
         : param hidden_size:    the number of features in the hidden state h
@@ -100,11 +101,52 @@ class lstm_wrapper(nn.Module):
 
         self.encoder = lstm_encoder(input_size=input_size, hidden_size=hidden_size)
         self.decoder = lstm_decoder(input_size=input_size, hidden_size=hidden_size)
+        self.teacher_forcing_ratio = teacher_forcing_ratio
+        self.target_len=target_len
+        self.batch_size=1
+        self.optimizer = optim.Adam(self.parameters())
 
-    def train_model(self, input_tensor, target_tensor, n_epochs, target_len, batch_size, teacher_forcing_ratio=0.5,
-                    learning_rate=0.01, dynamic_tf=False):
+    def forward(self,input_batch,target_batch):
+        """
+
+        :param input_batch: Tensor, input in the encoder, contains times series + features
+        :param decoder_features: Contains features (if there are any)
+        :return:
+        """
+        self.optimizer.zero_grad()
+        # initialize hidden state
+
+        # encoder outputs
+        encoder_output, encoder_hidden = self.encoder(input_batch)
+        # outputs tensor
+        outputs = torch.zeros(self.target_len, self.batch_size, input_batch.shape[2])
+        # decoder with teacher forcing
+        decoder_input = input_batch[-1, :, :]  # shape: (batch_size, input_size)  #TODO understand this line I have seen
+        #A LOT OF THESE INTIALIZATION JUST BE SUure
+        # initialization is that and not encoder_output..
+        decoder_hidden = encoder_hidden
+
+        # use teacher forcing
+        if random() < self.teacher_forcing_ratio:
+            for t in range(self.target_len):
+                decoder_output, decoder_hidden = self.decoder(decoder_input, decoder_hidden)
+                outputs[t] = decoder_output
+                decoder_input = target_batch[t, :, :]
+
+        # predict recursively
+        else:
+            for t in range(self.target_len):
+                decoder_output, decoder_hidden = self.decoder(decoder_input, decoder_hidden)
+                outputs[t] = decoder_output
+                decoder_input = decoder_output
+
+
+
+    def train_model(self, trainloader, n_epochs, target_len, batch_size, teacher_forcing_ratio=0.5,
+                    learning_rate=0.01,save=False,name_model="model"):
 
         '''
+        This model  is taken from https://github.com/lkulowski/LSTM_encoder_decoder/blob/master/code/lstm_encoder_decoder.py
         train lstm encoder-decoder
 
         : param input_tensor:              input data with shape (seq_len, # in batch, number features); PyTorch tensor
@@ -124,38 +166,40 @@ class lstm_wrapper(nn.Module):
         :                                  reduces the amount of teacher forcing for each epoch
         : return losses:                   array of loss function for each epoch
         '''
+        #TODO add features to be taken into account in the decoder ...
 
         # initialize array of losses
         losses = np.full(n_epochs, np.nan)
-
-        optimizer = optim.Adam(self.parameters(), lr=learning_rate)
+        loss_function = nn.MSELoss()
+        self.optimizer = optim.Adam(self.parameters(), lr=learning_rate)
         criterion = nn.MSELoss()
 
         # calculate number of batch iterations
-        n_batches = int(input_tensor.shape[1] / batch_size)
+        #n_batches = int(input_tensor.shape[1] / batch_size)
 
-        with range(n_epochs) as tr:
+        with trange(n_epochs) as tr:
             for it in tr:
 
                 batch_loss = 0.
-                batch_loss_tf = 0.
-                batch_loss_no_tf = 0.
-                num_tf = 0
-                num_no_tf = 0
-
-                for b in range(n_batches):
+                batch_size=0
+                for input_batch,target_batch in trainloader:
+                    input_batch=input_batch.unsqueeze(1)
+                    #target_batch = input_batch.unsqueeze(1)
+                    print("input",input_batch.shape)
+                    print("target",target_batch.shape)
+                    batch_size+=1
                     # select data
-                    input_batch = input_tensor[:, b: b + batch_size, :]
-                    target_batch = target_tensor[:, b: b + batch_size, :]
+                    #input_batch = input_tensor[:, b: b + batch_size, :]
+                    #target_batch = target_tensor[:, b: b + batch_size, :]
 
                     # outputs tensor
-                    outputs = torch.zeros(target_len, batch_size, input_batch.shape[2])
+                    outputs = torch.zeros(target_len, batch_size) #TODO MODIFY IF FEATURES
 
                     # initialize hidden state
-                    encoder_hidden = self.encoder.init_hidden(batch_size)
+                    encoder_hidden = self.encoder.init_hidden(batch_size) #TODO understand this line I have seen
 
                     # zero the gradient
-                    optimizer.zero_grad()
+                    self.optimizer.zero_grad()
 
                     # encoder outputs
                     encoder_output, encoder_hidden = self.encoder(input_batch)
@@ -180,20 +224,19 @@ class lstm_wrapper(nn.Module):
 
 
                     # compute the loss
-                    loss = criterion(outputs, target_batch)
+                    print("output dim",outputs.shape,target_batch.shape)
+                    loss =  loss_function(outputs, target_batch)
                     batch_loss += loss.item()
 
                     # backpropagation
                     loss.backward()
-                    optimizer.step()
+                    self.optimizer.step()
 
                 # loss for epoch
-                batch_loss /= n_batches
+                batch_loss /= batch_size
                 losses[it] = batch_loss
 
-                # dynamic teacher forcing
-                if dynamic_tf and teacher_forcing_ratio > 0:
-                    teacher_forcing_ratio = teacher_forcing_ratio - 0.02
+
 
                     # progress bar
                 tr.set_postfix(loss="{0:.3f}".format(batch_loss))

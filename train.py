@@ -55,8 +55,7 @@ def train(model, trainloader, valloader, lr: float, n_epochs: int, name_model="m
             #y = Variable(y)
             optimizer.zero_grad()
             model.hidden_cell = (torch.zeros(1, 1, model.hidden_layer_size),
-                                 torch.zeros(1, 1, model.hidden_layer_size))
-
+                               torch.zeros(1, 1, model.hidden_layer_size)) #TODO is it useful ??
             y_pred = model(seq.float())
 
             single_loss = loss_function(y_pred.float(), labels.float())

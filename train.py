@@ -4,8 +4,26 @@ from torch.autograd import Variable
 import numpy as np
 from typing import Tuple
 
+from constant import MODEL_DIR, CHECKPOINT_DIR
+
+
+def load_from_checkpoint(model,optimizer,path_checkpoint):
+    """
+
+    :param model:
+    :param optimizer:
+    :param path_checkpoint:
+    :return:
+    """
+    checkpoint = torch.load(path_checkpoint)
+    model.load_state_dict(checkpoint['model_state_dict'])
+    optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+    epoch = checkpoint['epoch']
+    loss = checkpoint['loss']
+    return model,epoch,loss
 
 def train(model, trainloader, valloader, lr: float, n_epochs: int, name_model="model", device=None, ite_print=10) -> Tuple[list, list, list]:
+
     """
     Trains a chosen model with given training and validation datasets and hyperparameters
     
@@ -60,7 +78,13 @@ def train(model, trainloader, valloader, lr: float, n_epochs: int, name_model="m
             print("epoch {} loss train {} loss val {}".format(i, single_loss.data, np.mean(loss_val_l)))
             
             if loss_val.data < best_val_loss:
-                torch.save(model, name_model + ".pt")
+                torch.save(model,MODEL_DIR+name_model + ".pt")
+                torch.save({
+                    'epoch': i,
+                    'model_state_dict': model.state_dict(),
+                    'optimizer_state_dict': optimizer.state_dict(),
+                    'loss': single_loss
+                }, CHECKPOINT_DIR+name_model + "_checkpoint_{}.pt".format(i))
                 best_val_loss = loss_val.data
                 bad_epochs = 0
 

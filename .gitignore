@@ -3,3 +3,4 @@
 **/*.pt
 *.pt
 
+/.ipynb_checkpoints/

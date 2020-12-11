@@ -54,7 +54,7 @@ def fill_missing_times(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def create_subd_df(
-    df: pd.DataFrame, begin_day: datetime.date, window_x_day: int, window_label_day: int, err_rate: int = 0.02
+    df: pd.DataFrame, begin_day: datetime.date, window_x_day: int, window_label_day: int, err_rate: int = 0.01
 ):
     """
     Given a begin date, extract the sub_df of the data for x and y.

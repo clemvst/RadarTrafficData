@@ -48,6 +48,7 @@ def train(model, trainloader, valloader, lr: float, n_epochs: int, name_model="m
     loss_val_list = []
     best_val_loss = 20.0
     bad_epochs = 0
+    #TODO return the mean loss for the train dataset
     for i in range(n_epochs):
         for seq, labels in trainloader:
             #x, y = seq.to(device, dtype=torch.long), labels.to(device, dtype=torch.long)

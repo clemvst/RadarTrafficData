@@ -8,6 +8,8 @@ import torch.nn as nn
 from torch import optim
 import torch.nn.functional as F
 
+from constant import MODEL_DIR, CHECKPOINT_DIR
+
 
 class lstm_encoder(nn.Module):
     ''' Encodes time-series sequence '''
@@ -107,7 +109,9 @@ class lstm_seq2seq(nn.Module):
         self.decoder = lstm_decoder(input_size=input_size, hidden_size=hidden_size)
 
     def train_model(self, trainloader,valloader, n_epochs, target_len, batch_size,
-                    training_prediction='recursive', teacher_forcing_ratio=0.5, learning_rate=0.01, dynamic_tf=False,ite_print=1):
+                    training_prediction='recursive', teacher_forcing_ratio=0.5, learning_rate=0.01,
+                    save=True,name_model="model_encoder_decoder",
+                    dynamic_tf=False,ite_print=1):
 
         '''
         train lstm encoder-decoder
@@ -137,7 +141,6 @@ class lstm_seq2seq(nn.Module):
         optimizer = optim.Adam(self.parameters(), lr=learning_rate)
         criterion = nn.MSELoss()
         loss_val_list=[]
-        loss_train=[]
         iteration=[]
 
         # calculate number of batch iterations
@@ -241,6 +244,17 @@ class lstm_seq2seq(nn.Module):
                 # loss for epoch
                 print("epoch {} loss train {} loss val {}".format(i, batch_loss, loss_val_l))
                 # dynamic teacher forcing
+                if loss_val.data < best_val_loss:
+                    if save:
+                        torch.save(self, MODEL_DIR + name_model + ".pt")
+                        torch.save({
+                            'epoch': i,
+                            'model_state_dict': self.state_dict(),
+                            'optimizer_state_dict': optimizer.state_dict(),
+                            'loss': batch_loss
+                        }, CHECKPOINT_DIR + name_model + "_checkpoint_{}.pt".format(i))
+                    best_val_loss = loss_val.data
+
                 if dynamic_tf and teacher_forcing_ratio > 0:
                     teacher_forcing_ratio = teacher_forcing_ratio - 0.02
 

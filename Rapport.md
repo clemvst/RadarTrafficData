@@ -98,11 +98,13 @@ ce modèle a été facile à implémenter et à tester, cependant il manque de f
 
 Un second modèle a été implémenté pour pouvoir répondre aux problèmes précédents. Connu pour son utilisation et son efficacité lors du traitement de time series, AJOUTER QQL SOURCES
 
-Le modèle encoder-decoder repose l'association de deux modèles : encoder/decoder. ![](/Users/iris/Code/RadarTrafficData/image/encoder_decoder.png)
+Le modèle lstm encoder-decoder repose l'association de deux modèles : encoder/decoder. 
+
+![](/Users/iris/Code/RadarTrafficData/image/encoder_decoder.png)
 
 [Image de *Video Prediction using Deep Learning and PyTorch (-lightning)* article](https://towardsdatascience.com/video-prediction-using-convlstm-with-pytorch-lightning-27b195fd21a2)
 
-Explication du modèle
+Le modèle encoder est similaire au modèle LSTM-simple. Pour 
 
 Expliquer le principe du teacher forcing
 

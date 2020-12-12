@@ -118,9 +118,7 @@ Expliquer le principe du teacher forcing
 
 #### Métriques utilisées, mesure de la qualité de la performances de l'algorithme
 
-
-
-Parler MSE, ajouter l'équation
+Nous avons utilisé le Mean Square Error comme fonction de loss dans notre
 
 Truc avec intervalle à 95%, montrer la loss qui fait ça 
 

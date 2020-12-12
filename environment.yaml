@@ -16,3 +16,4 @@ dependencies:
   - pip:
       - torchsummary
       - tqdm
+      - blitz-bayesian-pytorch

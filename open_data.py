@@ -5,7 +5,7 @@ from typing import Tuple
 import numpy as np
 
 
-def open_data(str_csv, direction: str, radar: str, year=None):
+def open_data(str_csv, direction: str, radar: None, year=None):
     """
     Open the csv, and filter the data given the values of the argument
     :param str_csv: path to csv
@@ -18,16 +18,18 @@ def open_data(str_csv, direction: str, radar: str, year=None):
     df = pd.read_csv(
         str_csv, parse_dates={"global_date": [3, 4, 5, 9]}, keep_date_col=True
     )  # open the csv
-    df = df[(df["location_name"] == radar)]
     if year is not None:
         df = df.loc[df["Year"] == str(year)]
-    df = df.loc[df["Direction"] == direction]
-    df = (
-        df.groupby("global_date")
-        .agg({"Volume": "sum", "Day of Week": lambda x: list(set(x))[0]})
-        .sort_values("global_date")
-        .reset_index()
-    )
+    if radar is not None:
+        df = df[(df["location_name"] == radar)]
+        df = df.loc[df["Direction"] == direction]
+        df = (
+            df.groupby("global_date")
+            .agg({"Volume": "sum", "Day of Week": lambda x: list(set(x))[0]})
+            .sort_values("global_date")
+            .reset_index()
+        )
+
     df["date"] = df.apply(
         lambda x: x.global_date.date(), axis=1
     )  # we use datetime functions

@@ -20,3 +20,6 @@ class LSTM(nn.Module):
         predictions = self.linear(lstm_out.view(len(input_seq), -1))
         return predictions[-1]
 
+    def predict(self,input_batch,target_len):
+        return self.forward(input_batch)
+

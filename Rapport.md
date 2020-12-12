@@ -64,15 +64,20 @@ IMPORTANT Expliquer que volume est la variable d'intérêt, et quels autres vari
 
 #### Visualisation des données
 
-Nous étudions ensuite les données pour un seul radar :  ' CAPITAL OF TEXAS HWY / LAKEWOOD DR' en direction NB. nous souhaitons rapidement, étudier une probable périodicité journalière des données
+Nous étudions ensuite les données pour un seul radar :  ' CAPITAL OF TEXAS HWY / LAKEWOOD DR' en direction NB. Nous souhaitons rapidement, étudier une probable périodicité journalière des données d'une même année.  Nous remarquons pour les jours 0 et 6, l'évolution du volume moyen se distingue des jours 1,2,3, 4 et 5. Ainsi il paraît important de transmettre des informations sur le jour de la semaine au réseaux de neurones. 
 
-d'une même année à la même heure d'acquisition (**insérer screen ??**). On agrège les données ayant la même exacte date
+![](/Users/iris/Code/RadarTrafficData/image/lakewood_mean_behavior_dayofweek_2018.png)
+
+Ensuite nous nous intéressons au volume moyen, par jour de la semaine, détecté par le radar CAPITAL OF TEXAS HWY / LAKEWOOD DR en direction NB, sur l'année 2018. 
+
+![](/Users/iris/Code/RadarTrafficData/image/Mean_volume_perday_2018.png)On agrège les données ayant la même exacte date
 d'acquisition.
 **insérer graph de image repertoire**
 **Analyser graph de image repertoire**
 
-##Préparer les données
-Le traitement des données a été fait de manière à pouvoir choisir la taille des données (input) en entrée et à prédire (label). Les différentes possibilités de construction de dataset, nous mènent à attribuer un identifiant pour chaque dataset construit. Nous utiliserons cette notation lors de la présentation des résultats.
+#### Préparation des datasets
+
+Le traitement des données a été fait de manière à pouvoir choisir la taille des données (input) en entrée et à prédire (label). Les différentes possibilités de construction de dataset, nous mènent à attribuer un identifiant pour chaque dataset construit. Nous utiliserons cette notation lors de la présentation des résultats. Puisque nous ne possédions pas de ressource type gpu pour entrainer nos réseaux de neurones, nous avons délibéremment choisit de ne pas construire des datasets avec une forte variabilité de données : selection de données provenant d'un seul radar, de la même année, d'une même direction. 
 
 | Identifiant du dataset | Nombre de radar | Direction | Taille total du dataset   | Taille input x en jour | Taille label y  | Nombre d'élément dans le dataset |
 | ----------------- |  ----------------- | ----------- | ----------- | ----------- | ----------- | ----------- |
@@ -80,7 +85,9 @@ Le traitement des données a été fait de manière à pouvoir choisir la taille
 |  |  |  | 1 an (2018) | 7 jours de données | 7 jours de données |  |
 |  |  |  | ** | 1 mois de données | 1 semaine de données |  |
 
+Puisque nous ne possédions pas de ressource type gpu pour entrainer nos réseaux de neurones, nous avons délibéremment choisit de ne pas construire des datasets avec une forte variabilité de données : selection de données provenant d'un seul radar, de la même année.  
 
+De plus comme 
 
 ### Réseaux de neurones utilisés
 
@@ -104,7 +111,7 @@ Le modèle lstm encoder-decoder repose l'association de deux modèles : encoder/
 
 [Image de *Video Prediction using Deep Learning and PyTorch (-lightning)* article](https://towardsdatascience.com/video-prediction-using-convlstm-with-pytorch-lightning-27b195fd21a2)
 
-Le modèle encoder est similaire au modèle LSTM-simple. Pour 
+Le modèle encoder est similaire au modèle LSTM-simple. Pour le décodeur, pour chaque du vecteur en sortie de la séquence
 
 Expliquer le principe du teacher forcing
 
@@ -124,7 +131,7 @@ Truc avec intervalle à 95%, montrer la loss qui fait ça
 
 ## Résultats
 
-
+Nos ressources en calcul étant limité, nous sommes conscient que nous avon souvent pratiqué de "early stopping", car nous ne pouvions pas forcément nous permettre de passer autant de temps à entrainer un réseau de neurones.
 
 ## Résultats et analyse
 

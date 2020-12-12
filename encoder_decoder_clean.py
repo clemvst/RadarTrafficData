@@ -153,6 +153,7 @@ class lstm_seq2seq(nn.Module):
                 batch_loss_no_tf = 0.
                 num_tf = 0
                 num_no_tf = 0
+                best_val_loss = 20.0
                 for input_batch,target_batch in trainloader:
                     # select data
                     #input_batch = input_tensor[:, b: b + batch_size, :]
@@ -288,9 +289,9 @@ class lstm_seq2seq(nn.Module):
             outputs[t] = decoder_output.squeeze(0)
             decoder_input = decoder_output
 
-        np_outputs = outputs.detach().numpy()
+        #np_outputs = outputs.detach().numpy()
 
-        return np_outputs
+        return outputs
 
     def predict_old(self, input_tensor, target_len):
 

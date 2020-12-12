@@ -1,7 +1,7 @@
 import torch
 from torch import nn
 from typing import List, Tuple
-
+import matplotlib.pyplot as plt
 
 def predict(path_model: str, testloader, device=None) -> Tuple[list, list, list]:
     """
@@ -28,3 +28,20 @@ def predict(path_model: str, testloader, device=None) -> Tuple[list, list, list]
         mse_list += [loss_val.data]
 
     return prediction, gt, mse_list
+
+def plot_predict(dic_model,valloader,seq_len,lcolor=None):
+    if lcolor is None:
+        lcolor=["blue","red","green","orange","purple"]
+    for seq,label in valloader:
+        fig, ax = plt.subplots()
+        for i,name_model in enumerate(dic_model): #dic torch_name, torchmodel
+            model=dic_model[name_model]
+            pred=model.predict(seq,seq_len)
+            print(pred.shape)
+            print(label.shape)
+            xpred=pred.squeeze(0).squeeze(0).detach().numpy()
+            ax.plot([i for i in range(seq_len)],xpred,lcolor[i], label="pred_{}".format(name_model))
+        xlab = label.squeeze(0).detach().numpy()
+        ax.plot([i for i in range(seq_len)],xlab,label="label")
+        ax.legend()
+        plt.show()

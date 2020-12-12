@@ -230,10 +230,12 @@ class lstm_seq2seq(nn.Module):
                     for seqval, labelval in valloader:  # maybe change the batch size of val an we avoid using a for loop ?
                         #seq_batch = seqval.unsqueeze(1)  # feat,seq
                         #seq_batch = target_batch.unsqueeze(1)  # feat,seq
-                        seqval = seqval.view(input_batch.shape[-1], )  # seq,feat
-                        labelval = target_batch.view(target_batch.shape[-1],
-                                                         target_batch.shape[0])
-                        output_val = self.predict(seqval)
+                        #seqval = seqval.view(input_batch.shape[-1],)  # seq,feat
+                        ##                                target_batch.shape[0])
+                        labelval = labelval.unsqueeze(1)  # feat,batch,seq
+                        labelval = labelval.view(labelval.shape[-1], labelval.shape[1],
+                                                         labelval.shape[0])
+                        output_val = self.predict(seqval,target_len=target_len)
                         loss_val = criterion(output_val.float(), labelval.float())
                         loss_val_l += loss_val.data
                     loss_val_list += [loss_val_l/len(valloader)]
@@ -242,18 +244,18 @@ class lstm_seq2seq(nn.Module):
                     iteration += [i]
                     #print("epoch {} loss train {} loss val {}".format(i, single_loss.data, np.mean(loss_val_l)))
                 # loss for epoch
-                print("epoch {} loss train {} loss val {}".format(i, batch_loss, loss_val_l))
+                    print("epoch {} loss train {} loss val {}".format(i, batch_loss, loss_val_l))
                 # dynamic teacher forcing
-                if loss_val.data < best_val_loss:
-                    if save:
-                        torch.save(self, MODEL_DIR + name_model + ".pt")
-                        torch.save({
-                            'epoch': i,
-                            'model_state_dict': self.state_dict(),
-                            'optimizer_state_dict': optimizer.state_dict(),
-                            'loss': batch_loss
-                        }, CHECKPOINT_DIR + name_model + "_checkpoint_{}.pt".format(i))
-                    best_val_loss = loss_val.data
+                    if loss_val.data < best_val_loss:
+                        if save:
+                            torch.save(self, MODEL_DIR + name_model + ".pt")
+                            torch.save({
+                                'epoch': i,
+                                'model_state_dict': self.state_dict(),
+                                'optimizer_state_dict': optimizer.state_dict(),
+                                'loss': batch_loss
+                            }, CHECKPOINT_DIR + name_model + "_checkpoint_{}.pt".format(i))
+                        best_val_loss = loss_val.data
 
                 if dynamic_tf and teacher_forcing_ratio > 0:
                     teacher_forcing_ratio = teacher_forcing_ratio - 0.02
@@ -263,15 +265,21 @@ class lstm_seq2seq(nn.Module):
 
         return iteration,losses,loss_val_list
 
-    def predict(self,input_batch,target_len):
+    def predict(self,input_batch,target_len,batch_size=1):
         """
-        :param input_batch: dim (seq,batch,feat)
+        :param input_batch: dim (seq,feat)
         :param target_len:
         :return:
         """
+        input_batch = input_batch.unsqueeze(1)  # feat,batch,seq
+        input_batch = input_batch.view(input_batch.shape[-1], input_batch.shape[1],
+                                       input_batch.shape[0])  # seq,batch,feat
+
+        outputs = torch.zeros(target_len, batch_size, input_batch.shape[2])  # seq,batch,feat
+
         # initialize tensor for predictions
         encoder_output, encoder_hidden = self.encoder(input_batch)
-        outputs = torch.zeros(target_len, input_batch.shape[2])
+        #outputs = torch.zeros(target_len, input_batch.shape[2])
         # decode input_tensor
         decoder_input = input_batch[-1, :, :]
         decoder_hidden = encoder_hidden

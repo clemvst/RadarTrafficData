@@ -23,7 +23,7 @@ Data: Kaggle "Radar Traffic Data. Traffic data collected from radar sensors depl
 - Most important: modeling, training, evaluating
 
 ## Introduction
-Rapport de Machine Learning sur le projet Kaggle Radar Traffic Data.
+Pour la construction de notre projet, nous avons procédé en plusieurs étapes : une première analyse des données, afin de comprendre leur construction et leur répartition, puis la mise en place d'un traitement de ces données pour créer des inputs de taille et de nature convenables pour prédire en série temporelle. Enfin, nous sommes passées à une grande phase d'expérimentation et nous avons choisi de tester plusieurs réseaux de deep learning, nous avons fait varier les paramètres ou hyperparamètres, nous avons joué sur le dataset et essayé de tirer des conclusions quant aux prédictions temporelles obtenues. Nos fonctions ou classes python principales sont organisées dans des fichiers .py et nos expérimentations dans des notebooks .ipynb. 
 
 
 
@@ -64,7 +64,7 @@ IMPORTANT Expliquer que volume est la variable d'intérêt, et quels autres vari
 
 #### Visualisation des données
 
-Nous étudions ensuite les données pour un seul radar :  ' CAPITAL OF TEXAS HWY / LAKEWOOD DR' en direction NB. Nous souhaitons rapidement, étudier une probable périodicité journalière des données d'une même année.  Nous remarquons pour les jours 0 et 6, l'évolution du volume moyen se distingue des jours 1,2,3, 4 et 5. Ainsi il paraît important de transmettre des informations sur le jour de la semaine au réseaux de neurones. 
+Nous étudions ensuite les données pour un seul radar : ' CAPITAL OF TEXAS HWY / LAKEWOOD DR' en direction NB. Nous souhaitons rapidement, étudier une probable périodicité journalière des données d'une même année.  Nous remarquons pour les jours 0 et 6, l'évolution du volume moyen se distingue des jours 1,2,3, 4 et 5. Ainsi il paraît important de transmettre des informations sur le jour de la semaine au réseaux de neurones. 
 
 <img src="image/lakewood_mean_behavior_dayofweek_2018.png">
 
@@ -80,11 +80,12 @@ On agrège les données ayant la même exacte date d'acquisition.
 
 Le traitement des données a été fait de manière à pouvoir choisir la taille des données (input) en entrée et à prédire (label). Les différentes possibilités de construction de dataset, nous mènent à attribuer un identifiant pour chaque dataset construit. Nous utiliserons cette notation lors de la présentation des résultats. Puisque nous ne possédions pas de ressource type gpu pour entrainer nos réseaux de neurones, nous avons délibéremment choisit de ne pas construire des datasets avec une forte variabilité de données : selection de données provenant d'un seul radar, de la même année, d'une même direction. 
 
-| Identifiant du dataset | Nombre de radar | Direction | Taille total du dataset   | Taille input x en jour | Taille label y  | Nombre d'élément dans le dataset |
-| ----------------- |  ----------------- | ----------- | ----------- | ----------- | ----------- | ----------- |
-| Dataset0 |  |  | 1 an (2018) | 7 jours de données | 1 jours de données| |
-|  |  |  | 1 an (2018) | 7 jours de données | 7 jours de données |  |
-|  |  |  | ** | 1 mois de données | 1 semaine de données |  |
+| Identifiant du dataset | Nombre de radar | Direction | Taille total du dataset   | Taille input x en jour | Taille label y  |
+| ----------------- |  ----------------- | ----------- | ----------- | ----------- | ----------- |
+| Dataset0 | 1 | 1 | 1 an (2018) | 7 jours de données | 1 jours de données|
+|  |  |  | 1 an (2018) | 7 jours de données | 7 jours de données |
+|  |  |  | ** | 1 mois de données | 1 semaine de données |
+|                        |                 |           |                         |                        |                      |
 
 Puisque nous ne possédions pas de ressource type gpu pour entrainer nos réseaux de neurones, nous avons délibéremment choisit de ne pas construire des datasets avec une forte variabilité de données : selection de données provenant d'un seul radar, de la même année.  
 
@@ -94,7 +95,7 @@ De plus comme
 
 #### LSTM-simple
 
-Le premier modèle repose sur le module LSTM 
+Le premier modèle repose sur le module LSTM  (je vais essayer de faire cette partie - clem)
 
 Inclure description schéma
 
@@ -124,11 +125,37 @@ Expliquer le principe du teacher forcing
 
 [Image de l'article *Encoder-Decoder Model for Multistep Time Series Forecasting Using PyTorch*  provenant de Towardsdatascience](https://towardsdatascience.com/encoder-decoder-model-for-multistep-time-series-forecasting-using-pytorch-5d54c6af6e60)
 
+
+
+#### Bayesian LSTM
+
+Nous avons choisi d'explorer la piste d'une prédiction rendue sous forme d'un interval de confiance plutôt qu'une valeur.  Le model LSTM Bayésien (mis à disposition par la bibliothèque BLiTZ) propose, en plus de l'architecture LSTM, d'utiliser la distribution de probabilité au lieu de poids "déterministes". Il s'agit ensuite d'optimiser ces paramètres de distribution.
+
+Le modèle choisi a été inspiré des travaux de Piero Esposito, principalement décrits ici : https://towardsdatascience.com/bayesian-lstm-on-pytorch-with-blitz-a-pytorch-bayesian-deep-learning-library-5e1fec432ad3 .
+
+Pour des couches de neurones non-bayesiennes, nous avons généralement pour équation non-linéaire :
+
+![equation](https://camo.githubusercontent.com/116cc90ed08d01c9b434e9bb4d86e821f384979ac056ffc21b3624ce2c53aeab/68747470733a2f2f6c617465782e636f6465636f67732e636f6d2f6769662e6c617465783f6125354525374228692b31292537442673706163653b3d2673706163653b5725354525374228692b312925374425354363646f742673706163653b7a2535452537422869292537442673706163653b2b2673706163653b6225354525374228692b3129253744)
+
+Les couches de neurones bayesiennes ont pour but d'introduire une incertitude sur les poids pour chaque opération forward. En mesurant la dispersion, la couche bayésienne permet de rassembler les différentes incertitudes pour les prédictions du modèle par rapport à un point donné du dataset.
+
+Pour chaque opération forward, il est nécessaire d'échantillonner les paramètres (W les poids et b les biais). Les équations utilisées pour cet échantillonnage sont définies ci-dessous :
+
+![equation](https://camo.githubusercontent.com/fe4450297696dc56e3c5c5548eee2842da1d8a35ef34806c66af76170207cc60/68747470733a2f2f6c617465782e636f6465636f67732e636f6d2f6769662e6c617465783f572535452537422869292537445f253742286e292537442673706163653b3d2673706163653b2535436d61746863616c2537424e25374428302c31292673706163653b2a2673706163653b6c6f6728312673706163653b2b2673706163653b25354372686f2535452537422869292537442673706163653b292673706163653b2b2673706163653b2535436d75253545253742286929253744)
+
+![equation](https://camo.githubusercontent.com/0a075b68e9d6c149c416277d8ff6f4c29659bfd7154abf84936c5e5c8bda15f1/68747470733a2f2f6c617465782e636f6465636f67732e636f6d2f6769662e6c617465783f622535452537422869292537445f253742286e292537442673706163653b3d2673706163653b2535436d61746863616c2537424e25374428302c31292673706163653b2a2673706163653b6c6f6728312673706163653b2b2673706163653b25354372686f2535452537422869292537442673706163653b292673706163653b2b2673706163653b2535436d75253545253742286929253744)
+
+où **ρ** représente l'écart-type et  **μ** représente la moyenne des échantillons.
+
+On utilise le mean square error loss et à la dérivabilité de celui ci. Pour chaque mouvement forward, le coût est calculé, pour chaque couche bayésienne. La somme des coûts de chaque couche bayésienne est ajoutée au loss.
+
+Expliquer ici mes fonctions rapide
+
 #### Métriques utilisées, mesure de la qualité de la performances de l'algorithme
 
 Nous avons utilisé le Mean Square Error comme fonction de loss dans notre
 
-Truc avec intervalle à 95%, montrer la loss qui fait ça 
+Pour le bayesian lstm, je parlerai de mon loss (mse et sampler) dans ma partie - clem
 
 ## Résultats
 
@@ -137,3 +164,4 @@ Nos ressources en calcul étant limité, nous sommes conscient que nous avon sou
 ## Résultats et analyse
 
 ## Conclusion
+

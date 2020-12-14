@@ -66,12 +66,13 @@ IMPORTANT Expliquer que volume est la variable d'intérêt, et quels autres vari
 
 Nous étudions ensuite les données pour un seul radar :  ' CAPITAL OF TEXAS HWY / LAKEWOOD DR' en direction NB. Nous souhaitons rapidement, étudier une probable périodicité journalière des données d'une même année.  Nous remarquons pour les jours 0 et 6, l'évolution du volume moyen se distingue des jours 1,2,3, 4 et 5. Ainsi il paraît important de transmettre des informations sur le jour de la semaine au réseaux de neurones. 
 
-![](/Users/iris/Code/RadarTrafficData/image/lakewood_mean_behavior_dayofweek_2018.png)
+<img src="image/lakewood_mean_behavior_dayofweek_2018.png">
 
 Ensuite nous nous intéressons au volume moyen, par jour de la semaine, détecté par le radar CAPITAL OF TEXAS HWY / LAKEWOOD DR en direction NB, sur l'année 2018. 
 
-![](/Users/iris/Code/RadarTrafficData/image/Mean_volume_perday_2018.png)On agrège les données ayant la même exacte date
-d'acquisition.
+<img src="image/Mean_volume_perday_2018.png">
+
+On agrège les données ayant la même exacte date d'acquisition.
 **insérer graph de image repertoire**
 **Analyser graph de image repertoire**
 
@@ -107,7 +108,7 @@ Un second modèle a été implémenté pour pouvoir répondre aux problèmes pr�
 
 Le modèle lstm encoder-decoder repose l'association de deux modèles : encoder/decoder. 
 
-![](/Users/iris/Code/RadarTrafficData/image/encoder_decoder.png)
+<img src="image/encoder_decoder.png">
 
 [Image de *Video Prediction using Deep Learning and PyTorch (-lightning)* article](https://towardsdatascience.com/video-prediction-using-convlstm-with-pytorch-lightning-27b195fd21a2)
 
@@ -119,7 +120,7 @@ Expliquer le principe du teacher forcing
 
 ##### Ajout de features
 
-![](/Users/iris/Code/RadarTrafficData/image/encode_decoder_features.png)
+<img src="image/encode_decoder_features.png">
 
 [Image de l'article *Encoder-Decoder Model for Multistep Time Series Forecasting Using PyTorch*  provenant de Towardsdatascience](https://towardsdatascience.com/encoder-decoder-model-for-multistep-time-series-forecasting-using-pytorch-5d54c6af6e60)
 

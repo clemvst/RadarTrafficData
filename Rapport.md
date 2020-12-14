@@ -72,8 +72,8 @@ Ensuite nous nous intéressons au volume moyen, par jour de la semaine, détect�
 
 <img src="image/Mean_volume_perday_2018.png">
 
-On agrège les données ayant la même exacte date d'acquisition.
-**insérer graph de image Analyser graph de imagerepertoiree**
+
+
 
 #### Préparation des datasets
 
@@ -252,7 +252,7 @@ Il aurait peut être été interessant de laisser l'entrainement se faire sur un
 
 Les résultats obtenus avec le modèle encodeur-decodeur actuel ne sont pas réellement satisfaisant, puisque non représentatif de la réalité. L'étude de la variation de la loss sur le dataset de validation montre bien un soucis dans l'entrainement :  il n'y a pas de phénomène de décroissance de la loss. 
 
-Pour justifier ces mauvaises performances, il est possible de considérer que l'entrainement a été fini beaucoup trop tôt empéchant le modèle de converger ou qu'il faille changer la valeur du learning rate.
+Les causes de ces mauvaises performances peuvent être l'arrêt trop tôt de l'entrainement ou *early stopping*empéchant le modèle de converger ou un mauvais réglage des hyperparamètres. 
 
 
 

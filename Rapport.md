@@ -65,7 +65,7 @@ IMPORTANT Expliquer que volume est la variable d'intérêt
 
 #### Visualisation des données
 
-Nous étudions ensuite les données pour un seul radar : ' CAPITAL OF TEXAS HWY / LAKEWOOD DR' en direction NB. Nous souhaitons rapidement, étudier une probable périodicité journalière des données d'une même année. Nous remarquons pour les jours 0 et 6 (respectivement samedi et dimanche), l'évolution du volume moyen se distingue des autre  jours de la semaine 1,2,3, 4 et 5. Ainsi il paraît important de transmettre des informations sur le jour de la semaine au réseaux de neurones. 
+Nous étudions ensuite les données pour un seul radar : ' CAPITAL OF TEXAS HWY / LAKEWOOD DR' en direction NB. Nous souhaitons rapidement, étudier une probable périodicité journalière des données d'une même année. Nous remarquons pour les jours 0 et 6 (respectivement samedi et dimanche), l'évolution du volume moyen se distingue des autre jours de la semaine 1,2,3, 4 et 5. Ainsi il paraît important de transmettre des informations sur le jour de la semaine au réseaux de neurones. 
 
 <img src="image/lakewood_mean_behavior_dayofweek_2018.png">
 
@@ -87,7 +87,7 @@ Le traitement des données a été fait de manière à pouvoir choisir la taille
 |  |  |  | ** | 1 mois de données | 1 semaine de données |  |
 |                        |                 |           |                         |                        |                      |                      |
 
-Puisque nous ne possédions pas de ressource type gpu pour entrainer nos réseaux de neurones, nous avons délibéremment choisit de ne pas construire des datasets avec une forte variabilité de données : selection de données provenant d'un seul radar, de la même année.  
+
 
 Enfin à partir ce ces datasets, juste avant l'entrainement nous les diviserons en trois sous datasets : entrainement, validation et test avec respectivement 80% , 5% et 15% des données.
 
@@ -113,7 +113,9 @@ ce modèle a été facile à implémenter et à tester, cependant il manque de f
 
 #### LSTM Encoder-decoder
 
-Nous avons cherché à étudier un second modèle encodeur décodeur ou *seq2seq* qui correspond à la concaténation de deux modèles : un modèle encodeur et un modèle décodeur
+Nous avons cherché à étudier un second modèle encodeur décodeur ou *seq2seq* qui correspond à la concaténation de deux modèles : un modèle encodeur et un modèle décodeur. Nous nous sommes inspirés de l'implémentation sous pytorch du modèle [lstm_encoder_decoder](https://github.com/lkulowski/LSTM_encoder_decoder/blob/master/code/lstm_encoder_decoder.py) développé par Ikulowski sur disponible sur github.
+
+
 
 <img src="image/encoder_decoder.png">
 

@@ -73,7 +73,7 @@ Nous remarquons pour les jours 0 et 6 (respectivement samedi et dimanche), l'év
 
 #### Préparation des datasets
 
-Le traitement des données a été fait de manière à pouvoir choisir la taille des données (input) en entrée et à prédire (label). Les différentes possibilités de construction de dataset, nous mènent à attribuer un identifiant pour chaque dataset construit. Nous utiliserons cette notation lors de la présentation des résultats. Puisque nous ne possédions pas de ressource type gpu pour entrainer nos réseaux de neurones, nous avons délibérément choisit de ne pas construire des datasets avec une forte variabilité de données : sélection de données provenant d'un seul radar, de la même année, d'une même direction. 
+Le traitement des données a été fait de manière à pouvoir choisir la taille des données (input) en entrée et à prédire (label). Les différentes possibilités de construction de dataset, nous mènent à attribuer un identifiant pour chaque dataset construit. Nous utiliserons cette notation lors de la présentation des résultats. Puisque nous ne possédions pas de ressource type gpu pour entrainer nos réseaux de neurones, nous avons délibérément choisit de ne pas construire des datasets avec une faible variabilité de données : sélection de données provenant d'un seul radar, de la même année, d'une même direction. 
 
 | Identifiant du dataset | Nombre de radar | Direction | Ecart maximale entre les données | Taille input x en jour | Taille label y  | Taille totale du dataset |
 | ----------------- |  ----------------- | ----------- | ----------- | ----------- | ----------- | ----------- |

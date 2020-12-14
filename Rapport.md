@@ -56,11 +56,11 @@ Chaque radar fournit des données toutes les 15 minutes. Chaque nouvel apport de
 
 La variable que nous chercherons à prédire est Volume car elle reflète le nombre de voitures qui passent devant le radar entre deux instants et est utile pour prédire la circulation au sein de la ville. 
 
-Nous remarquons également des irrégularités pour des données. Par exemple, ils existent également de temps en temps pour un même radar, dans la même direction, à la même exacte heure, deux données de volume différentes. Dans ce cas là, nous sommerons les deux volumes obtenues. Par ailleurs, il peut arriver que les données manquent totalement sur une journée ou bien juste le temps d'une acquisition (il y aura alors une différence de 30 minutes entre deux acquisitions). Travaillant avec des données temporelles, nous souhaitons avoir exactement le même échantillonage des données. Nous serons ainsi amené lors de la construction de nos batch de données à remplacer par 0 la valeur d'une donnée si elle est absente de manière isolée, ou alors supprimer complètement le batch dépendant d'un jour sans données. L'ensemble de nos fonction gérant l'analyse et la construction des datasets est contenu dans open_data.py.
+Nous remarquons également des irrégularités pour des données. Par exemple, ils existent également de temps en temps pour un même radar, dans la même direction, à la même exacte heure, deux données de volume différentes. Dans ce cas là, nous sommerons les deux volumes obtenues. Par ailleurs, il peut arriver que les données manquent totalement sur une journée ou bien juste le temps d'une acquisition (il y aura alors une différence de 30 minutes entre deux acquisitions). Travaillant avec des données temporelles, nous souhaitons avoir exactement le même échantillonnage des données. Nous serons ainsi amenés lors de la construction de nos batchs de données à remplacer par 0 la valeur d'une donnée si elle est absente de manière isolée, ou alors supprimer complètement le batch dépendant d'un jour sans données. L'ensemble de nos fonctions gérant l'analyse et la construction des datasets est contenu dans open_data.py.
 
 #### Visualisation des données
 
-Nous étudions ensuite les données pour un seul radar : ' CAPITAL OF TEXAS HWY / LAKEWOOD DR' en direction NB. Nous souhaitons rapidement, étudier une probable périodicité journalière des données d'une même année.
+Nous étudions ensuite les données pour un seul radar : 'CAPITAL OF TEXAS HWY / LAKEWOOD DR' en direction NB. Nous souhaitons rapidement, étudier une probable périodicité journalière des données d'une même année.
 
 <img src="image/lakewood_mean_behavior_dayofweek_2018.png">
 
@@ -68,7 +68,7 @@ Ensuite nous nous visualisons le volume moyen, par jour de la semaine, détecté
 
 <img src="image/Mean_volume_perday_2018.png">
 
-Nous remarquons pour les jours 0 et 6 (respectivement samedi et dimanche), l'évolution du volume moyen se distingue des autre jours de la semaine 1,2,3, 4 et 5. Ainsi il paraît important de transmettre des informations sur le jour de la semaine au réseaux de neurones.  
+Nous remarquons pour les jours 0 et 6 (respectivement samedi et dimanche), l'évolution du volume moyen se distingue des autre jours de la semaine 1,2,3, 4 et 5. Ainsi il paraît important de transmettre des informations sur le jour de la semaine au réseaux de neurones.
 
 
 #### Préparation des datasets
@@ -122,7 +122,7 @@ Notre modèle LSTM simple est composé : d'une couche LSTM, d'une couche Linear.
 
 #### LSTM Encoder-decoder
 
-Nous avons cherché à étudier un second modèle encodeur décodeur ou *seq2seq* qui correspond à la concaténation de deux modèles : un modèle encodeur et un modèle décodeur. Nous nous sommes inspirés de l'implémentation sous pytorch du modèle [lstm_encoder_decoder](https://github.com/lkulowski/LSTM_encoder_decoder/blob/master/code/lstm_encoder_decoder.py) développé par Ikulowski sur disponible sur github. L'implémentation du modèle dans notre code est encoder_decoder_clean.py.
+Nous avons cherché à étudier un second modèle encodeur décodeur ou *seq2seq* qui correspond à la concaténation de deux modèles : un modèle encodeur et un modèle décodeur. Nous nous sommes inspirés de l'implémentation sous Pytorch du modèle [lstm_encoder_decoder](https://github.com/lkulowski/LSTM_encoder_decoder/blob/master/code/lstm_encoder_decoder.py) développé par Ikulowski sur disponible sur github. L'implémentation du modèle dans notre code est *encoder_decoder_clean.py.*
 
 
 
@@ -134,7 +134,7 @@ Nous avons cherché à étudier un second modèle encodeur décodeur ou *seq2seq
 
 ##### Modèle encodeur
 
-Le modèle encodeur encode une séquence en un vecteur de longueur fixe. Ce modèle est constitué d'une succession de blocs récurents, dans notre cas des blocs LSTM. Chaque "bloc" prend en entrée un élément de la séquence et le propage. Le *hidden state* à chaque t est calculée de la manière suivante: 
+Le modèle encodeur encode une séquence en un vecteur de longueur fixe. Ce modèle est constitué d'une succession de blocs récurents, dans notre cas des blocs LSTM. Chaque "bloc" prend en entrée un élément de la séquence et le propage. Le *hidden state* à chaque t est calculée de la manière suivante : 
 
 <img src="image/formule_hidden_state_encoder.png" style="zoom:30%;" />
 
@@ -160,9 +160,9 @@ Pour faciliter la convergence du modèle lors de l'entrainement, la méthode de 
 
 Pour le moment tous les modèles que nous avons choisi ne prennent qu'en entrée les données *Volumes* temporelles du jeux de données. Il existent des modèles encodeur-décodeur où il est possible d'ajouter des features afin de rendre les prédictions plus précises. 
 
-Par exemple, nous avons remarqué lors de l'analyse des données que le Volume de voiture variait en fonction du jour de la semaine. Ainsi rajouter ces informations  n entrée du réseau pourraient améliorer la précision du modèle. 
+Par exemple, nous avons remarqué lors de l'analyse des données que le Volume de voiture variait en fonction du jour de la semaine. Ainsi rajouter ces informations en entrée du réseau pourraient améliorer la précision du modèle. 
 
-En ajoutant des features,  comme le jour de la semaine, il sera par exemple probablement possible de diminuer la taille des données d'entrée (en nombre de données temporelles).  Il est également possible de penser qu'avec un modèle prenant en compte les features, le modèle pourra s'entrainer et prédire correctement sur des données provenant de radar différents, si la variable qualitative *nom du radar* est pris en compte en entrée du réseau. 
+En ajoutant des features, comme le jour de la semaine, il sera par exemple probablement possible de diminuer la taille des données d'entrée (en nombre de données temporelles).  Il est également possible de penser qu'avec un modèle prenant en compte les features, le modèle pourra s'entrainer et prédire correctement sur des données provenant de radars différents, si la variable qualitative *nom du radar* est pris en compte en entrée du réseau. 
 
 <img src="image/encode_decoder_features.png">
 
@@ -174,7 +174,7 @@ En ajoutant des features,  comme le jour de la semaine, il sera par exemple prob
 
 ##### Le principe des couches bayésiennes
 
-Nous avons choisi d'explorer la piste d'une prédiction rendue sous forme d'un interval de confiance plutôt qu'une valeur.  Le model LSTM Bayésien (mis à disposition par la bibliothèque BLiTZ) propose, en plus de l'architecture LSTM, d'utiliser la distribution de probabilité au lieu de poids "déterministes". Il s'agit ensuite d'optimiser ces paramètres de distribution.
+Nous avons choisi d'explorer la piste d'une prédiction rendue sous forme d'un interval de confiance plutôt qu'une valeur. Le model LSTM Bayésien (mis à disposition par la bibliothèque BLiTZ) propose, en plus de l'architecture LSTM, d'utiliser la distribution de probabilité au lieu de poids "déterministes". Il s'agit ensuite d'optimiser ces paramètres de distribution.
 
 Le modèle choisi a été inspiré des travaux de Piero Esposito (ainsi que les images ci dessous), principalement décrits ici : [Bayesian LSTM with Pytorch - Towards Data Science](https://towardsdatascience.com/bayesian-lstm-on-pytorch-with-blitz-a-pytorch-bayesian-deep-learning-library-5e1fec432ad3 ) .
 

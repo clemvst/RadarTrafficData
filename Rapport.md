@@ -219,32 +219,6 @@ Pour le bayesian lstm, je parlerai de mon loss (mse et sampler) dans ma partie -
 
 Nos ressources en calcul étant limité, nous sommes conscient que nous avons de temps en temps pratiqué l'*early stopping*, car nous ne pouvions pas forcément nous permettre de passer autant de temps à entrainer un réseau de neurones.
 
-#### Bayesian LSTM
-
-Pour le modèle LSTM bayesien, le modèle sélectionné a été entrainé avec les paramètres et hyperparamètres suivants :
-
-| Paramètre/hyperparamètre | Valeur                                                       |
-| ------------------------ | ------------------------------------------------------------ |
-| Input_dim                | 7 jours x 24 x 4 (nombre de valeurs relevées par le radar pour 7 jours) |
-| Hidden_dim               | 70                                                           |
-| Output_dim               | 1 jour x 24 x 4 (nombre de valeurs à prédire pour 1 jour)    |
-| Learning rate            | 0.001                                                        |
-| Nb of epochs             | 100                                                          |
-
-Les 100 epochs prennent environ 3 minutes pour ce modèle et nous pourrions envisager d'entrainer un peu plus longtemps ou en faisant varier l'hidden_dim pour prendre en compte plus de features. L'entrainement de 700 epochs testé n'ayant pas apporté de précisions beaucoup plus flagrantes, nous avons décidé de continuer avec 100 epochs pour ce modèle.
-
-La particularité de la méthode sample_elbo utilisée dans le train construit des valeurs de loss_train très élevées, mais qui diminuent au fil des itérations.
-
-<img src="image/loss_bayesian.png" width="400px" height="550px">
-
-On remarque également que le loss de la validation diminue fortement mais reste un peu instable par la suite. Essayer de faire tourner ce modèle sur des datasets différents pourrait potentiellement donner des résultats un peu meilleurs, même si l'allure générale de l'évolution du loss démontre déjà un certain apprentissage effectué.
-
-Les résultats sont intéressants du fait de la visualisation du l'intervalle de confiance calculé :
-
-<img src="image/image_interval_bayesian2.png">
-
-<img src="image/image_interval_bayesian.png">
-
 ### LSTM simple
 
 Nous avons entrainé le model simple sur le Dataset0 décrit précédemment en faisant varier le learning rate    entre les valeurs suivantes : 0.05, 0.001 et 0.01.
@@ -278,6 +252,36 @@ L'entrainement de ce réseau de neurones a été particulièrement difficile et 
 **Insérer graphique et prédictions**
 
 Puisque les résultats sans features n'étaient pas satisfaisant et le temps d'entrainement lent (30 minutes pour 100 epochs) , nous n'avons pas cherché à complexifier le modèle avec des features et à l'entrainer.
+
+
+
+#### Bayesian LSTM
+
+Pour le modèle LSTM bayesien, le modèle sélectionné a été entrainé avec les paramètres et hyperparamètres suivants :
+
+| Paramètre/hyperparamètre | Valeur                                                       |
+| ------------------------ | ------------------------------------------------------------ |
+| Input_dim                | 7 jours x 24 x 4 (nombre de valeurs relevées par le radar pour 7 jours) |
+| Hidden_dim               | 70                                                           |
+| Output_dim               | 1 jour x 24 x 4 (nombre de valeurs à prédire pour 1 jour)    |
+| Learning rate            | 0.001                                                        |
+| Nb of epochs             | 100                                                          |
+
+Les 100 epochs prennent environ 3 minutes pour ce modèle et nous pourrions envisager d'entrainer un peu plus longtemps ou en faisant varier l'hidden_dim pour prendre en compte plus de features. L'entrainement de 700 epochs testé n'ayant pas apporté de précisions beaucoup plus flagrantes, nous avons décidé de continuer avec 100 epochs pour ce modèle.
+
+La particularité de la méthode sample_elbo utilisée dans le train construit des valeurs de loss_train très élevées, mais qui diminuent au fil des itérations.
+
+<img src="image/loss_bayesian.png" width="400px" height="550px">
+
+On remarque également que le loss de la validation diminue fortement mais reste un peu instable par la suite. Essayer de faire tourner ce modèle sur des datasets différents pourrait potentiellement donner des résultats un peu meilleurs, même si l'allure générale de l'évolution du loss démontre déjà un certain apprentissage effectué.
+
+Les résultats sont intéressants du fait de la visualisation du l'intervalle de confiance calculé :
+
+<img src="image/image_interval_bayesian2.png">
+
+<img src="image/image_interval_bayesian.png">
+
+### 
 
 ## Discussion
 

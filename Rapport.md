@@ -23,7 +23,7 @@ Data: Kaggle "Radar Traffic Data. Traffic data collected from radar sensors depl
 - Most important: modeling, training, evaluating
 
 ## Introduction
-Pour la construction de notre projet, nous avons procédé en plusieurs étapes : une première analyse des données, afin de comprendre leur construction et leur répartition, puis la mise en place d'un traitement de ces données pour créer des inputs de taille et de nature convenables pour prédire en série temporelle. Enfin, nous sommes passées à une grande phase d'expérimentation et nous avons choisi de tester plusieurs réseaux de deep learning, nous avons fait varier les paramètres ou hyperparamètres, nous avons joué sur le dataset et essayé de tirer des conclusions quant aux prédictions temporelles obtenues. Nos fonctions ou classes python principales sont organisées dans des fichiers .py et nos expérimentations dans des notebooks .ipynb. Une fonction main.py permet d'ouvrir les data, lancer le processing de son choix, entrainer le modèle, ajuster les paramètres.
+Pour la construction de notre projet, nous avons procédé en plusieurs étapes : une première analyse des données, afin de comprendre leur construction et leur répartition, puis la mise en place d'un traitement de ces données pour créer des inputs de taille et de nature convenables pour prédire en série temporelle. Enfin, nous sommes passées à une grande phase d'expérimentation et nous avons choisi de tester plusieurs réseaux de deep learning.  Nous avons fait varier les paramètres ou hyperparamètres, nous avons joué sur le dataset et essayé de tirer des conclusions quant aux prédictions temporelles obtenues. Nos fonctions ou classes python principales sont organisées dans des fichiers .py et nos expérimentations dans des notebooks .ipynb. Une fonction main.py permet d'ouvrir les data, lancer le processing de son choix, entrainer le modèle, ajuster les paramètres.
 
 
 
@@ -54,9 +54,9 @@ Chaque radar fournit des données toutes les 15 minutes. Chaque nouvel apport de
 | Direction | ['None', 'NB', 'SB', 'EB', 'WB'] indique la direction du passage des voitures compté par le radar | 5 |    |
 | Volume| Nombre refletant le passage des voitures au niveau du radar entre deux instants| 256 |    |
 
-La variable que nous chercherons à prédire est Volume car elle reflète le nombre de voiture qui passent devant le radar entre deux instants et est utile pour prédire la circulation au sein de la ville. 
+La variable que nous chercherons à prédire est Volume car elle reflète le nombre de voitures qui passent devant le radar entre deux instants et est utile pour prédire la circulation au sein de la ville. 
 
-Nous remarquons également des irrégularités pour des données. Par exemple, ils existent également de temps en temps pour un même radar, dans la même direction, à la même exacte heure deux données de volume différentes. Dans ce cas là, nous sommerons les deux volumes obtenues. Par ailleurs, il peut arriver que les données manquent totalement sur une journée ou bien juste le temps d'une acquisition (il y aura alors une différence de 30 minutes entre deux acquisitions). Travaillant avec des données temporelles, nous souhaitons avoir exactement le même échantillonage des données. Nous serons ainsi amené lors de la construction de nos batch de données à remplacer par 0 la valeur d'une donnée si elle est absente, de manière isolée, ou alors supprimer complètement le batch dépendant d'un jour sans données. L'ensemble de nos fonction gérant l'analyse et la construction des datasets est contenu dans open_data.py.
+Nous remarquons également des irrégularités pour des données. Par exemple, ils existent également de temps en temps pour un même radar, dans la même direction, à la même exacte heure, deux données de volume différentes. Dans ce cas là, nous sommerons les deux volumes obtenues. Par ailleurs, il peut arriver que les données manquent totalement sur une journée ou bien juste le temps d'une acquisition (il y aura alors une différence de 30 minutes entre deux acquisitions). Travaillant avec des données temporelles, nous souhaitons avoir exactement le même échantillonage des données. Nous serons ainsi amené lors de la construction de nos batch de données à remplacer par 0 la valeur d'une donnée si elle est absente de manière isolée, ou alors supprimer complètement le batch dépendant d'un jour sans données. L'ensemble de nos fonction gérant l'analyse et la construction des datasets est contenu dans open_data.py.
 
 #### Visualisation des données
 
@@ -64,11 +64,11 @@ Nous étudions ensuite les données pour un seul radar : ' CAPITAL OF TEXAS HWY 
 
 <img src="image/lakewood_mean_behavior_dayofweek_2018.png">
 
-Ensuite nous nous visualisons au volume moyen, par jour de la semaine, détecté par le radar CAPITAL OF TEXAS HWY / LAKEWOOD DR en direction NB, sur l'année 2018. 
+Ensuite nous nous visualisons le volume moyen, par jour de la semaine, détecté par le radar CAPITAL OF TEXAS HWY / LAKEWOOD DR en direction NB, sur l'année 2018. 
 
 <img src="image/Mean_volume_perday_2018.png">
 
- Nous remarquons pour les jours 0 et 6 (respectivement samedi et dimanche), l'évolution du volume moyen se distingue des autre jours de la semaine 1,2,3, 4 et 5. Ainsi il paraît important de transmettre des informations sur le jour de la semaine au réseaux de neurones.  
+Nous remarquons pour les jours 0 et 6 (respectivement samedi et dimanche), l'évolution du volume moyen se distingue des autre jours de la semaine 1,2,3, 4 et 5. Ainsi il paraît important de transmettre des informations sur le jour de la semaine au réseaux de neurones.  
 
 
 #### Préparation des datasets
@@ -77,12 +77,12 @@ Le traitement des données a été fait de manière à pouvoir choisir la taille
 
 | Identifiant du dataset | Nombre de radar | Direction | Ecart maximale entre les données | Taille input x en jour | Taille label y  | Taille totale du dataset |
 | ----------------- |  ----------------- | ----------- | ----------- | ----------- | ----------- | ----------- |
-| Dataset0 | 1 | 1 | 1 an (2018) | 7 jours de données | 1 jours de données| |
+| Dataset0 | 1 | 1 | 1 an (2018) | 7 jours de données | 1 jours de données| 175 |
 | Dataset1 | 1 | 1 | 4 mois (début 2018) | 7 jours de données | 1 jours de données | 42 |
 
-La construction des Dataset0 et Dataset1 est poussée par le fait qu'il semble y avoir une certaine répétitivité du phénomène par semaine. Ainsi on peut présumer que connaître la variation du volume de voiture pour ce radar la semaine d'avant le jour de prédiction nous aidera grandement. 
+La construction des Dataset0 et Dataset1 est poussée par le fait qu'il semble y avoir une certaine répétitivité du phénomène par semaine. Ainsi, on peut présumer que connaître la variation du volume de voiture pour ce radar la semaine d'avant le jour de prédiction nous aidera grandement. 
 
-Enfin à partir ce ces datasets, juste avant l'entrainement nous les diviserons en trois sous datasets : entrainement, validation et test avec respectivement 80% , 5% et 15% des données.
+Enfin à partir de ces datasets, juste avant l'entrainement nous les diviserons en trois sous datasets : entrainement, validation et test avec respectivement 80% , 5% et 15% des données.
 
 | Nom du dataset | Role                                                         |
 | -------------- | ------------------------------------------------------------ |
@@ -122,7 +122,7 @@ Notre modèle LSTM simple est composé : d'une couche LSTM, d'une couche Linear.
 
 #### LSTM Encoder-decoder
 
-Nous avons cherché à étudier un second modèle encodeur décodeur ou *seq2seq* qui correspond à la concaténation de deux modèles : un modèle encodeur et un modèle décodeur. Nous nous sommes inspirés de l'implémentation sous pytorch du modèle [lstm_encoder_decoder](https://github.com/lkulowski/LSTM_encoder_decoder/blob/master/code/lstm_encoder_decoder.py) développé par Ikulowski sur disponible sur github.
+Nous avons cherché à étudier un second modèle encodeur décodeur ou *seq2seq* qui correspond à la concaténation de deux modèles : un modèle encodeur et un modèle décodeur. Nous nous sommes inspirés de l'implémentation sous pytorch du modèle [lstm_encoder_decoder](https://github.com/lkulowski/LSTM_encoder_decoder/blob/master/code/lstm_encoder_decoder.py) développé par Ikulowski sur disponible sur github. L'implémentation du modèle dans notre code est encoder_decoder_clean.py.
 
 
 
@@ -134,7 +134,7 @@ Nous avons cherché à étudier un second modèle encodeur décodeur ou *seq2seq
 
 ##### Modèle encodeur
 
-Le modèle encodeur encode une séquence en un vecteur de longueur fixe. Ce modèle est constitué d'une succession de blocs récurent, dans notre cas des blocs LSTM. Chaque "bloc" prend en entrée un élément de la séquence et le propage. Le *hidden state* à chaque t est calculée de la manière suivante: 
+Le modèle encodeur encode une séquence en un vecteur de longueur fixe. Ce modèle est constitué d'une succession de blocs récurents, dans notre cas des blocs LSTM. Chaque "bloc" prend en entrée un élément de la séquence et le propage. Le *hidden state* à chaque t est calculée de la manière suivante: 
 
 <img src="image/formule_hidden_state_encoder.png" style="zoom:30%;" />
 
@@ -148,9 +148,9 @@ Le modèle décodeur décode un vecteur de longueur fixe et prédit une séquenc
 
 ##### Teacher forcing
 
-Il peut être difficile d'entrainer un modèle *seq2seq*, car initialement les prédictions faites par chacun des blocs du décodeur sont non précises, et sont prises en compte pour la prédiction du blocs suivant. 
+Il peut être difficile d'entrainer un modèle *seq2seq*, car initialement les prédictions faites par chacun des blocs du décodeur sont non précises, et sont prises en compte pour la prédiction du bloc suivant. 
 
-Pour faciliter la convergence du modèle lors de l'entrainement, la méthode de *teacher forcing* peut être utilisé.  Au sein du décodeur, au lieu d'utiliser la prédiction du blocs précédent (prédiction à t-1) pour calculer une sortie à t, la valeur de la vérité terrain à t-1 est utilisée. 
+Pour faciliter la convergence du modèle lors de l'entrainement, la méthode de *teacher forcing* peut être utilisé.  Au sein du décodeur, au lieu d'utiliser la prédiction du bloc précédent (prédiction à t-1) pour calculer une sortie à t, la valeur de la vérité terrain à t-1 est utilisée. 
 
 <img src="image/teacher_forcing.png" alt="teacher_forcing" style="zoom:50%;" />
 
@@ -160,7 +160,7 @@ Pour faciliter la convergence du modèle lors de l'entrainement, la méthode de 
 
 Pour le moment tous les modèles que nous avons choisi ne prennent qu'en entrée les données *Volumes* temporelles du jeux de données. Il existent des modèles encodeur-décodeur où il est possible d'ajouter des features afin de rendre les prédictions plus précises. 
 
-Par exemple, nous avons remarqué lors de l'analyse des données que le Volume de voiture variait en fonction du jour de la semaine. Ainsi rajouter ces informations lors du features d'entrée pourraient améliorer la précision du modèle. 
+Par exemple, nous avons remarqué lors de l'analyse des données que le Volume de voiture variait en fonction du jour de la semaine. Ainsi rajouter ces informations  n entrée du réseau pourraient améliorer la précision du modèle. 
 
 En ajoutant des features,  comme le jour de la semaine, il sera par exemple probablement possible de diminuer la taille des données d'entrée (en nombre de données temporelles).  Il est également possible de penser qu'avec un modèle prenant en compte les features, le modèle pourra s'entrainer et prédire correctement sur des données provenant de radar différents, si la variable qualitative *nom du radar* est pris en compte en entrée du réseau. 
 
@@ -236,7 +236,7 @@ Nos ressources en calcul étant limité, nous sommes conscient que nous avons de
 
 Nous avons entrainé le model simple sur le Dataset0 décrit précédemment en faisant varier le learning rate    entre les valeurs suivantes : 0.05, 0.001 et 0.01.
 
-En étudiant la variation de loss pour ces différents learning rate, nous avons remarqué que l'entrainement ne semble converger que pour un learning rate de 0.001.
+En étudiant la variation de loss pour ces différents learning rate, nous avons remarqué que l'entrainement ne semblait converger que pour un learning rate de 0.001.
 
 Lors de l'entrainement du modèle LSTM simple, avec  un learning rate de 0.001 et pour 700 epochs, nous obtenons l'évolution de la loss mse suivante. 
 
@@ -260,7 +260,7 @@ Nous avons également visualisé les prédictions effectué par ce modèle :
 
 L'entrainement de ce réseau de neurones a été particulièrement difficile et couteux en temps. L'entrainement étant long, nous avons travaillé avec un petit dataset pour ce réseau : le Dataset1, décrit dans la section *préparation des datasets*. 
 
-Avec une méthode de *teacher forcing*, un learning rate à 0.001, la dimension de *hidden state* de 64 et 300 epochs d'entrainement les prédictions en test obtenus sont les suivantes : 
+Avec une méthode de *teacher forcing*, un learning rate à 0.001, la dimension de *hidden dim* de 64 et 300 epochs d'entrainement les prédictions en test obtenus sont les suivantes : 
 
 
 
@@ -268,10 +268,12 @@ Avec une méthode de *teacher forcing*, un learning rate à 0.001, la dimension 
 
 ​								<u>Prédictions de encoder-decoder sur le dataset de Test de dataset1</u> 
 
-Puisque les résultats sans features n'étaient pas satisfaisant et le temps d'entrainement lent (30 minutes pour 100 epochs) , nous n'avons pas cherché à complexifier le modèle avec des features et à l'entrainer.
+
 ![loss_val_encoder-decoder](image/loss_val_encoder-decoder.png)
 
 ​		<u>Évolution de la loss sur le dataset de validation lors de l'entrainement du modèle encodeur-décodeur</u>
+
+
 
 Puisque les résultats sans features n'étaient pas satisfaisant et le temps d'entrainement lent ( jusqu'à 40 minutes pour 300 epochs) , nous n'avons pas cherché à complexifier le modèle avec des features et à l'entrainer.
 
@@ -307,11 +309,11 @@ Les résultats sont intéressants du fait de la visualisation du l'intervalle de
 
 ## Discussion
 
-Puisque nous ne possédions pas de ressources réellement suffisantes nous sommes conscient que les résultats ne sont pas réellement représentatifs de ce que ces modèles pourrait prédire en réalité. Par exemple, les performances décevantes du modèle encodeur décodeur peuvent s'explique par le faible nombre d'epoch utilisé pour l'entrainement. De plus, le temps d'entrainement des réseaux limitent également la recherche d'hyper-paramètre. Quelques essais de variations du learning rate ont été fait, mais il aurait pu être intéressant pour chaque modèle de faire varier le taille du vecteur *hidden state* et  le nombre de couche LSTM utilisé. 
+Puisque nous ne possédions pas de ressources réellement suffisantes nous sommes conscient que les résultats ne sont pas réellement représentatifs de ce que ces modèles pourrait prédire en réalité. Par exemple, les performances décevantes du modèle encodeur décodeur peuvent s'explique par le faible nombre d'epoch utilisé pour l'entrainement. De plus, le temps d'entrainement des réseaux limitent également la recherche d'hyper-paramètre. Quelques essais de variations du learning rate ont été fait, mais il aurait pu être intéressant pour chaque modèle de faire varier le taille du vecteur *hidden state* et le nombre de couche LSTM utilisé. 
 
 ### Jeux de données
 
-Nous avons eu des difficulté à entrainer le réseaux de neurones du fait de notre grand nombre de données et faible capacité de nos ordinateurs. Comme nous avions remarqué une certaine répétitive de la variable volume de manière hebdomadaire, il aurait pu être intéressant d'utiliser plutôt uniquement les données à Jour-7 pour prédire au Jours J, ou même J-14, J-7 pour prédire au jour J. 
+Nous avons eu certaines fois des difficultés à entrainer les réseaux de neurones du fait de notre grand nombre de données et faible capacité de nos ordinateurs. Comme nous avions remarqué une certaine répétitive de la variable volume de manière hebdomadaire, il aurait pu être intéressant d'utiliser plutôt uniquement les données à Jour-7 pour prédire au Jours J, ou même J-14, J-7 pour prédire au jour J. 
 
 ### Simple LSTM model
 
@@ -323,13 +325,13 @@ De plus, l'observation des prédictions montre une certaine cohérence avec la v
 
 <u>Prédictions de simple_model sur le dataset de train du dataset0</u>
 
-Il aurait peut être été interessant de laisser l'entrainement se faire sur un plus grande nombre d'epochs. 
+Il aurait peut être été interessant de laisser l'entrainement se faire sur un plus grande nombre d'epochs, ou rajouter des couches LSTM.
 
 ### Encodeur-décodeur
 
 Les résultats obtenus avec le modèle encodeur-decodeur actuel ne sont pas réellement satisfaisants, puisque non représentatifs de la réalité. L'étude de la variation de la loss sur le dataset de validation montre bien un souci dans l'entrainement :  il n'y a pas de phénomène de décroissance de la loss. 
 
-Les causes de ces mauvaises performances peuvent être l'arrêt trop tôt de l'entrainement ou *early stopping*empéchant le modèle de converger ou un mauvais réglage des hyperparamètres. 
+Les causes de ces mauvaises performances peuvent être l'arrêt trop tôt de l'entrainement ou *early stopping* empéchant le modèle de converger ou un mauvais réglage des hyperparamètres empêchant la convergence de la méthode. 
 
 ### Bayesian LSTM
 
@@ -337,7 +339,11 @@ Le principe de la méthode bayesian LSTM a permis d'obtenir des résultats inté
 
 <img src="image/loss_val.png" width="400px" height="300px">
 
-On remarque que le loss de la validation diminue fortement mais reste un peu instable par la suite. Essayer de faire tourner ce modèle sur des datasets différents pourrait potentiellement donner des résultats un peu meilleurs, même si l'allure générale de l'évolution du loss démontre déjà un certain apprentissage effectué. Enfin, les résultats du modèle sont quand même très intéressants et méritent d'y porter d'avantage de temps de travail.
+On remarque que le loss de la validation diminue fortement mais reste un peu instable par la suite. Essayer de faire tourner ce modèle sur des datasets différents pourrait potentiellement donner des résultats un peu meilleurs, même si l'allure générale de l'évolution du loss démontre déjà un certain apprentissage effectué. De plus, la visualisation des prédictions dans les données de test montrent que l'intervalle de confiance encadre quasiment totalement l'ensemble des données de la vérité terrain. 
+
+Enfin, il aurait pu être intéressant d'éventuellement utiliser une métrique pour quantifier la qualité de l'intervalle de confiance prédit. 
+
+
 
 
 

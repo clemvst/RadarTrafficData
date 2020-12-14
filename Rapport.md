@@ -3,9 +3,9 @@
 
 <img src="image/timelapse_austin.png" width="634px" height="403px">
 
-Iris Dumeur & Clémence Vast
+​										Iris Dumeur & Clémence Vast
 
-14/12/2020 - Ecole des Mines de Nancy
+​								14/12/2020 - Ecole des Mines de Nancy
 
 ## Rappel des consignes
 Data: Kaggle "Radar Traffic Data. Traffic data collected from radar sensors deployed by the City of Austin."
@@ -94,6 +94,8 @@ Enfin à partir ce ces datasets, juste avant l'entrainement nous les diviserons 
 
 ### Réseaux de neurones utilisés
 
+Nous avons testé différents réseaux, pour lesquels nous avons joué avec les paramètres ou hyperparamètres pour obtenir des résultats intéressants.
+
 #### LSTM-simple
 
 Le premier modèle repose sur le module LSTM (*Long Short-Term Memory*). Cette couche est composée de trois “portes” qui gèrent les différentes informations. On a également deux types de sorties.
@@ -108,9 +110,15 @@ Le premier modèle repose sur le module LSTM (*Long Short-Term Memory*). Cette c
 
 
 
+*[Image issue d'un schéma accessible ici](https://fr.wikipedia.org/wiki/R%C3%A9seau_de_neurones_r%C3%A9currents)* 
+
 Les opérations dans les portes permettent au LSTM de garder et filtrer certaines informations en mémoire. Dans une phrase écrite par exemple, la couche LSTM va garder le sens principal de la phrase et supprimer les mots qui importent peu comme les déterminants ou certains connecteurs.
 
 Ici, le but est de mettre en évidence la tendance qui se dégage dans la série temporelle. Ce modèle a été facile à implémenter et à tester, cependant il manque de finesse et peut-être que son architecture pourrait être développée davantage. L'inclusion des features n'est pas prévu dans notre modèle et cela pourrait être une piste d'amélioration.
+
+Notre modèle LSTM simple est composé : d'une couche LSTM, d'une couche Linear. Il est disponible dans le fichier *simple_model.py*.
+
+
 
 #### LSTM Encoder-decoder
 
@@ -140,7 +148,7 @@ Le modèle décodeur décode un vecteur de longueur fixe et prédit une séquenc
 
 ##### Teacher forcing
 
-Il peut être difficile d'entrainer un modèle *seq2seq*, car initiallement les prédictions faites par chacun des blocs du décodeur sont non précises, et sont prises en compte pour la prédiction du blocs suivant. 
+Il peut être difficile d'entrainer un modèle *seq2seq*, car initialement les prédictions faites par chacun des blocs du décodeur sont non précises, et sont prises en compte pour la prédiction du blocs suivant. 
 
 Pour faciliter la convergence du modèle lors de l'entrainement, la méthode de *teacher forcing* peut être utilisé.  Au sein du décodeur, au lieu d'utiliser la prédiction du blocs précédent (prédiction à t-1) pour calculer une sortie à t, la valeur de la vérité terrain à t-1 est utilisée. 
 
@@ -148,11 +156,9 @@ Pour faciliter la convergence du modèle lors de l'entrainement, la méthode de 
 
 [Translation or Answering tool: seq2seq with teacher forcing and attention mechanism](https://medium.com/@vivekvscool/translation-or-answer-tool-seq2seq-with-teacher-forcing-and-attention-mechanism-7cfd9cb03b3a)
 
-
-
 ##### Ajout de features
 
-Pour le moment tous les modèles que nous avons choisit ne prennent qu'en entrée les données *Volumes* temporelles du jeux de données. Il existent des modèles encodeur-décodeur où il est possible d'ajouter des features afin de rendre les prédictions plus précises. 
+Pour le moment tous les modèles que nous avons choisi ne prennent qu'en entrée les données *Volumes* temporelles du jeux de données. Il existent des modèles encodeur-décodeur où il est possible d'ajouter des features afin de rendre les prédictions plus précises. 
 
 Par exemple, nous avons remarqué lors de l'analyse des données que le Volume de voiture variait en fonction du jour de la semaine. Ainsi rajouter ces informations lors du features d'entrée pourraient améliorer la précision du modèle. 
 
@@ -170,7 +176,7 @@ En ajoutant des features,  comme le jour de la semaine, il sera par exemple prob
 
 Nous avons choisi d'explorer la piste d'une prédiction rendue sous forme d'un interval de confiance plutôt qu'une valeur.  Le model LSTM Bayésien (mis à disposition par la bibliothèque BLiTZ) propose, en plus de l'architecture LSTM, d'utiliser la distribution de probabilité au lieu de poids "déterministes". Il s'agit ensuite d'optimiser ces paramètres de distribution.
 
-Le modèle choisi a été inspiré des travaux de Piero Esposito, principalement décrits ici : https://towardsdatascience.com/bayesian-lstm-on-pytorch-with-blitz-a-pytorch-bayesian-deep-learning-library-5e1fec432ad3 .
+Le modèle choisi a été inspiré des travaux de Piero Esposito (ainsi que les images ci dessous), principalement décrits ici : [Bayesian LSTM with Pytorch - Towards Data Science](https://towardsdatascience.com/bayesian-lstm-on-pytorch-with-blitz-a-pytorch-bayesian-deep-learning-library-5e1fec432ad3 ) .
 
 Pour des couches de neurones non-bayesiennes, nous avons généralement pour équation non-linéaire :
 
@@ -212,11 +218,15 @@ On obtient aussi des prédictions dont la certitude est exprimée pour la phase 
 
 
 
-#### Métriques utilisées, mesure de la qualité de la performances de l'algorithme
+#### Métriques utilisées
 
-Nous avons utilisé le Mean Square Error comme fonction de loss dans notre
+Nous avons utilisé le Mean Square Error comme fonction de loss dans notre fonction train. Le MSE est très utilisé pour les travaux de séries temporelles car il permet de calculer une différence au carré entre la valeur vraie et la prédiction, faisant donc ressortir l'erreur causée entre les deux.
 
-Pour le bayesian lstm, je parlerai de mon loss (mse et sampler) dans ma partie - clem
+<img src="image/mse.svg">
+
+​													           *Formule du mean square error Loss* from [here](https://en.wikipedia.org/wiki/Mean_squared_error)
+
+
 
 ## Résultats
 
@@ -230,9 +240,13 @@ En étudiant la variation de loss pour ces différents learning rate, nous avons
 
 Lors de l'entrainement du modèle LSTM simple, avec  un learning rate de 0.001 et pour 700 epochs, nous obtenons l'évolution de la loss mse suivante. 
 
-![](image/train_simple_model.png)
 
-​													*Variation de la loss pour LSTM simple*
+
+<img src="image/train_simple_model.png">
+
+​													            *Variation de la loss pour LSTM simple*
+
+
 
 Nous avons également visualisé les prédictions effectué par ce modèle :
 
@@ -281,15 +295,15 @@ La particularité de la méthode sample_elbo utilisée dans le train construit d
 
 <img src="image/loss_bayesian.png" width="400px" height="550px">
 
-On remarque également que le loss de la validation diminue fortement mais reste un peu instable par la suite. Essayer de faire tourner ce modèle sur des datasets différents pourrait potentiellement donner des résultats un peu meilleurs, même si l'allure générale de l'évolution du loss démontre déjà un certain apprentissage effectué.
 
-Les résultats sont intéressants du fait de la visualisation du l'intervalle de confiance calculé :
+
+Les résultats sont intéressants du fait de la visualisation du l'intervalle de confiance calculé. On dessine la différence entre la borne inférieure et la borne inférieure de l'intervalle en vert pour mettre en évidence les zones d'incertitude :
 
 <img src="image/image_interval_bayesian2.png">
 
 <img src="image/image_interval_bayesian.png">
 
-### 
+
 
 ## Discussion
 
@@ -309,16 +323,25 @@ De plus, l'observation des prédictions montre une certaine cohérence avec la v
 
 <u>Prédictions de simple_model sur le dataset de train du dataset0</u>
 
-Il aurait peut être été interessant de laisser l'entrainement se faire sur un plus grande nombre d'epoch. 
+Il aurait peut être été interessant de laisser l'entrainement se faire sur un plus grande nombre d'epochs. 
 
 ### Encodeur-décodeur
 
-Les résultats obtenus avec le modèle encodeur-decodeur actuel ne sont pas réellement satisfaisant, puisque non représentatif de la réalité. L'étude de la variation de la loss sur le dataset de validation montre bien un soucis dans l'entrainement :  il n'y a pas de phénomène de décroissance de la loss. 
+Les résultats obtenus avec le modèle encodeur-decodeur actuel ne sont pas réellement satisfaisants, puisque non représentatifs de la réalité. L'étude de la variation de la loss sur le dataset de validation montre bien un souci dans l'entrainement :  il n'y a pas de phénomène de décroissance de la loss. 
 
 Les causes de ces mauvaises performances peuvent être l'arrêt trop tôt de l'entrainement ou *early stopping*empéchant le modèle de converger ou un mauvais réglage des hyperparamètres. 
+
+### Bayesian LSTM
+
+Le principe de la méthode bayesian LSTM a permis d'obtenir des résultats intéressants et un peu différents de ce qui se fait d'habitude. En effet, pour les prédictions de données temporelles, il peut être utile de fournir un intervalle de confiance afin de garder de la distance avec l'erreur que le modèle peut entrainer. 
+
+<img src="image/loss_val.png" width="400px" height="300px">
+
+On remarque que le loss de la validation diminue fortement mais reste un peu instable par la suite. Essayer de faire tourner ce modèle sur des datasets différents pourrait potentiellement donner des résultats un peu meilleurs, même si l'allure générale de l'évolution du loss démontre déjà un certain apprentissage effectué. Enfin, les résultats du modèle sont quand même très intéressants et méritent d'y porter d'avantage de temps de travail.
 
 
 
 ## Conclusion
 
-Le modèle idéal : prend en information : jour de la semaine, vacances scolaires, jours férié, mois de l'année, le nom du radar, la direction et donne le résultat. 
+Nos résultats permettent de balayer plusieurs méthodes de prédiction des données radar et nous avons tenté de faire varier un nombre important de facteurs, comme le type de dataset, la taille de celui ci, les paramètres et hyperparamètres. Une analyse des résultats montre qu'aucun modèle n'est parfait mais on peut noter des valeurs très convenables pour le modèle Bayesian LSTM. Peut-être pourrions nous améliorer ses performances en ajoutant des couches et de la profondeur à notre réseau pour capter d'avantages de features. Nous avons pensé à diverses pistes de recherche et d'améliorations. Un modèle idéal prendrait en compte beaucoup plus d'informations : jour de la semaine, vacances scolaires, jours férié, mois de l'année, le nom du radar, la direction et donnerait alors des résultats beaucoup plus précis. 
+

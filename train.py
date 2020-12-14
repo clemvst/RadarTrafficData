@@ -24,7 +24,7 @@ def load_from_checkpoint(model, optimizer, path_checkpoint):
 
 
 def train(model, trainloader, valloader, lr: float, n_epochs: int, name_model="model", device=None, ite_print=10,
-          save=True) -> Tuple[list, list, list]:
+          save=True, is_bayes=False) -> Tuple[list, list, list]:
     """
     Trains a chosen model with given training and validation datasets and hyperparameters
     
@@ -35,6 +35,8 @@ def train(model, trainloader, valloader, lr: float, n_epochs: int, name_model="m
     :param n_epochs: number of epochs
     :param device: cuda or cpu
     :param ite_print: path of iterations to print (ex: print every 5 epochs)
+    :param save: Boolean to choose to save the model or not
+    :param is_bayes: Boolean to choose to use the bayesian sampling or not
     
     :return: tuple with list of epochs iterations, list of train loss values, list of val loss values
 
@@ -51,15 +53,20 @@ def train(model, trainloader, valloader, lr: float, n_epochs: int, name_model="m
     #TODO return the mean loss for the train dataset
     for i in range(n_epochs):
         for seq, labels in trainloader:
-            #x, y = seq.to(device, dtype=torch.long), labels.to(device, dtype=torch.long)
-            #x = Variable(x)
-            #y = Variable(y)
+            
             optimizer.zero_grad()
-            model.hidden_cell = (torch.zeros(1, 1, model.hidden_layer_size),
-                               torch.zeros(1, 1, model.hidden_layer_size)) #TODO is it useful ??
-            y_pred = model(seq.float())
+            if is_bayes:
+                single_loss = model.sample_elbo(inputs=seq.float(),
+                                                labels=labels.float(),
+                                                criterion=loss_function,
+                                                sample_nbr=1)
+            
+            else:
+                model.hidden_cell = (torch.zeros(1, 1, model.hidden_layer_size),
+                               torch.zeros(1, 1, model.hidden_layer_size))
+                y_pred = model(seq.float())
+                single_loss = loss_function(y_pred.float(), labels.float())
 
-            single_loss = loss_function(y_pred.float(), labels.float())
             single_loss.backward()
             optimizer.step()
 
@@ -67,9 +74,6 @@ def train(model, trainloader, valloader, lr: float, n_epochs: int, name_model="m
             loss_val_l = []
             for seqval, labelval in valloader:  # maybe change the batch size of val an we avoid using a for loop ?
                 #xval, yval = seqval.to(device, dtype=torch.long), labelval.to(device, dtype=torch.long)
-
-                #xval = Variable(xval)
-                #yval = Variable(yval)
                 output_val = model(seqval.float())
                 loss_val = loss_function(output_val.float(), labelval.float())
                 loss_val_l += [loss_val.data]

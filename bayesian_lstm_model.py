@@ -7,7 +7,7 @@ from blitz.utils import variational_estimator
 
 @variational_estimator
 class BayesLSTM(nn.Module):
-        """
+    """
     Function inspired (BUT WITH MANY CHANGES) by Piero Esposito's functions for Bayesian Model
     
     https://towardsdatascience.com/bayesian-lstm-on-pytorch-with-blitz-a-pytorch-bayesian-deep-learning-library-5e1fec432ad3

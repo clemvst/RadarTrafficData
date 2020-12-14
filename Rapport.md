@@ -46,16 +46,15 @@ Décrire pourquoi on en supprime certaines
 
 | Nom de la colonne | Description | Nombre d'entités | Remarques particulieres |
 | ----------------- | ----------- |----------------- | ----------------------- |
-| Global date | dates et heures détaillées | 71599 |  |
 | Location     | string, Nom du radar, un nom correspond à une localisation précise | 23  |    |
-| location_latitude | latitude de la position du radar | 18 |    |
-| location_longitude | longitude de la position du radar | 18 |    |
-| Year | Année d'acquisition | 3 |    |
-| Month | Mois d'acquisition | 12 |    |
-| Day | Jours d'acquisition | 31 |    |
-| Day of Week | Jours de la semaine, entier allant de de 0 à 6 | 7 |    |
-| Direction | None, NB ou *** , indique la direction du passage des voitures compté par le radar | 5 |    |
-| Volume| Nombre refletant le passage des voitures au niveau du radar entre deux instants| 256 |    |
+| location_latitude | latitude de la position du radar |    |    |
+| location_logitude | logitude de la position du radar |    |    |
+| Year | Année d'acquisition |    |    |
+| Month | Mois d'acquisition |    |    |
+| Day | Jours d'acquisition |    |    |
+| Day of Week | Jours de la semaine, entier allant de de 0 à 6 |    |    |
+| Direction | None, NB ou *** , indique la direction du passage des voitures compté par le radar |    |    |
+| Volume| Nombre refletant le passage des voitures au niveau du radar entre deux instants|    |    |
 
 Nous remarquons également des irrégularités pour des données, il est possible que certaines données manque. Ils existent de temps en temps pour un même radar, dans la même direction, à la même exacte heure deux données de volume différentes. Dans ce cas là nous sommerons les deux volumes obtenues. Par ailleurs, il peut arriver que les données manquent totalement sur une journée ou bien juste le temps d'une acquisition (il y aura alors une différence de 30 minutes entre deux acquisition). Travaillant avec des données temporelles, nous souhaitons avoir exactement le même échantillonage des données, ce qui nous menera à faire l'algorithme suivant de sélection des données : 
 
@@ -74,23 +73,30 @@ Ensuite nous nous intéressons au volume moyen, par jour de la semaine, détect�
 <img src="image/Mean_volume_perday_2018.png">
 
 On agrège les données ayant la même exacte date d'acquisition.
-**insérer graph de image repertoire**
-**Analyser graph de image repertoire**
+**insérer graph de image Analyser graph de imagerepertoiree**
 
 #### Préparation des datasets
 
-Le traitement des données a été fait de manière à pouvoir choisir la taille des données (input) en entrée et à prédire (label). Les différentes possibilités de construction de dataset, nous mènent à attribuer un identifiant pour chaque dataset construit. Nous utiliserons cette notation lors de la présentation des résultats. Puisque nous ne possédions pas de ressource type gpu pour entrainer nos réseaux de neurones, nous avons délibéremment choisit de ne pas construire des datasets avec une forte variabilité de données : selection de données provenant d'un seul radar, de la même année, d'une même direction. 
+Le traitement des données a été fait de manière à pouvoir choisir la taille des données (input) en entrée et à prédire (label). Les différentes possibilités de construction de dataset, nous mènent à attribuer un identifiant pour chaque dataset construit. Nous utiliserons cette notation lors de la présentation des résultats. Puisque nous ne possédions pas de ressource type gpu pour entrainer nos réseaux de neurones, nous avons délibérément choisit de ne pas construire des datasets avec une forte variabilité de données : sélection de données provenant d'un seul radar, de la même année, d'une même direction. 
 
-| Identifiant du dataset | Nombre de radar | Direction | Taille total du dataset   | Taille input x en jour | Taille label y  |
-| ----------------- |  ----------------- | ----------- | ----------- | ----------- | ----------- |
-| Dataset0 | 1 | 1 | 1 an (2018) | 7 jours de données | 1 jours de données|
-|  |  |  | 1 an (2018) | 7 jours de données | 7 jours de données |
-|  |  |  | ** | 1 mois de données | 1 semaine de données |
-|                        |                 |           |                         |                        |                      |
+| Identifiant du dataset | Nombre de radar | Direction | Ecart maximale entre les données | Taille input x en jour | Taille label y  | Taille totale du dataset |
+| ----------------- |  ----------------- | ----------- | ----------- | ----------- | ----------- | ----------- |
+| Dataset0 | 1 | 1 | 1 an (2018) | 7 jours de données | 1 jours de données| |
+| Dataset1 | 1 | 1 | 4 mois (début 2018) | 7 jours de données | 1 jours de données | 42 |
+|  |  |  | ** | 1 mois de données | 1 semaine de données |  |
+|                        |                 |           |                         |                        |                      |                      |
 
 Puisque nous ne possédions pas de ressource type gpu pour entrainer nos réseaux de neurones, nous avons délibéremment choisit de ne pas construire des datasets avec une forte variabilité de données : selection de données provenant d'un seul radar, de la même année.  
 
-De plus comme 
+Enfin à partir ce ces datasets, juste avant l'entrainement nous les diviserons en trois sous datasets : entrainement, validation et test avec respectivement 80% , 5% et 15% des données.
+
+| Nom du dataset | Role                                                         |
+| -------------- | ------------------------------------------------------------ |
+| Entrainement   | Données sur lequel est entrainé le réseau de neurones        |
+| Validation     | Permet de régler le choix des hyperparamètres du réseau de neurones |
+| Test           | Données permettant d'établir les performances du modèle      |
+
+
 
 ### Réseaux de neurones utilisés
 
@@ -186,9 +192,55 @@ Pour le bayesian lstm, je parlerai de mon loss (mse et sampler) dans ma partie -
 
 ## Résultats
 
-Nos ressources en calcul étant limité, nous sommes conscient que nous avon souvent pratiqué de "early stopping", car nous ne pouvions pas forcément nous permettre de passer autant de temps à entrainer un réseau de neurones.
+Nos ressources en calcul étant limité, nous sommes conscient que nous avons souvent pratiqué de  temps en temps "early stopping", car nous ne pouvions pas forcément nous permettre de passer autant de temps à entrainer un réseau de neurones.
 
-## Résultats et analyse
+### LSTM simple
+
+Nous avons entrainé le model simple sur le Dataset0 décrit précédemment en faisant varier le learning rate    entre les valeurs suivantes : 0.05, 0.001 et 0.01.
+
+En étudiant la variation de loss pour ces différents learning rate, nous avons remarqué que l'entrainement ne semble converger que pour un learning rate de 0.001.
+
+Lors de l'entrainement du modèle LSTM simple, avec  un learning rate de 0.001 et pour 700 epochs, nous obtenons l'évolution de la loss mse suivante. 
+
+![](image/train_simple_model.png)
+
+​													*Variation de la loss pour LSTM simple*
+
+Nous avons également visualisé les prédictions effectué par ce modèle :
+
+ <img src="/Users/iris/Code/RadarTrafficData/image/test_simple_model.png" style="zoom:80%;" />  <img src="/Users/iris/Code/RadarTrafficData/image/test2_simple_model.png" alt="test2_simple_model" style="zoom:80%;" />
+
+​			<u>Prédictions simple-model LSTM sur le dataset de test de Dataset0</u>
+
+### Encodeur-décodeur
+
+L'entrainement de ce réseau de neurones a été particulièrement difficile et couteux en temps. L'entrainement étant long, nous avons travaillé avec un petit dataset pour ce réseau : le Dataset1, décrit dans la section *préparation des datasets*. Rapidement le réseaux de neurone ne produit qu'une seule et même prédiction, peut importe les données d'entrée. La méthode de teacher forcing ainsi que la modification du learning rate pour des valeurs entre 0.001 et 0.01 n'ont pas résolu ce problème.
+
+<img src="/Users/iris/Code/RadarTrafficData/image/test_encoder_decoder.png" alt="test_encoder_decoder" style="zoom:75%;" />
+
+<img src="/Users/iris/Code/RadarTrafficData/image/test_encoder_decoder.png" alt="test_encoder_decoder" style="zoom:75%;" />
+
+​													<u>Prédictions de encoder-decoder sur le dataset de Test de dataset1</u> 
+
+
+
+**Insérer graphique et prédictions**
+
+Puisque les résultats sans features n'étaient pas satisfaisant et le temps d'entrainement lent (30 minutes pour 100 epochs) , nous n'avons pas cherché à complexifier le modèle avec des features et à l'entrainer.
+
+## Discussion
+
+Puisque nous ne possédions pas de ressources réellement suffisantes nous sommes conscient que les résultats ne sont pas réellement représentatifs de ce que ces modèles pourrait prédire en réalité. Par exemple les performances décevantes du modèle encodeur décodeur peuvent s'explique par le faible nombre d'epoch utilisé pour l'entrainement. 
+
+### Simple LSTM model
+
+L'étude de la variation de loss pour le simple LSTM model, montre bien un phase d'aprentissage. Nous avons une décroissance de la loss pour le dataset de train et de validation avec l'atteinte d'un potentiel plateau.
+
+De plus, l'observation des prédictions montre une certaine cohérence avec la vérité terrain. Cependant, la valeur de la loss dans le dataset d'entrainement étant bien plus faible que pour le dataset de validation. Il 
+
+### Encodeur-décodeur
+
+Les résultats obtenus avec le modèle encodeur-decodeur actuel ne sont pas réellement satisfaisant, puisque non représentatif de la réalité. Le fait que le réseau à un moment de donne qu'une seule prédiction peut s'explique pour différentes raison
 
 ## Conclusion
 

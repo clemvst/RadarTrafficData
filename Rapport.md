@@ -152,6 +152,8 @@ En ajoutant des features,  comme le jour de la semaine, il sera possible de dimi
 
 #### Bayesian LSTM
 
+##### Le principe des couches bayésiennes
+
 Nous avons choisi d'explorer la piste d'une prédiction rendue sous forme d'un interval de confiance plutôt qu'une valeur.  Le model LSTM Bayésien (mis à disposition par la bibliothèque BLiTZ) propose, en plus de l'architecture LSTM, d'utiliser la distribution de probabilité au lieu de poids "déterministes". Il s'agit ensuite d'optimiser ces paramètres de distribution.
 
 Le modèle choisi a été inspiré des travaux de Piero Esposito, principalement décrits ici : https://towardsdatascience.com/bayesian-lstm-on-pytorch-with-blitz-a-pytorch-bayesian-deep-learning-library-5e1fec432ad3 .
@@ -172,7 +174,29 @@ où **ρ** représente l'écart-type et  **μ** représente la moyenne des écha
 
 On utilise le mean square error loss et à la dérivabilité de celui ci. Pour chaque mouvement forward, le coût est calculé, pour chaque couche bayésienne. La somme des coûts de chaque couche bayésienne est ajoutée au loss.
 
-Expliquer ici mes fonctions rapide
+##### L'implémentation sous Pytorch
+
+Les paramètres à entrainer dans notre cas sont ρ et μ, afin de déterminer la distribution en probabilité des poids. Pour construire le modèle LSTM bayésien, nous utilisons la bibliothèque BLiTZ, qui possède un objet couche BayesianLSTM tout prêt. 
+
+Nous importons cette couche bayésienne ainsi qu'un décorateur *@variational_estimator* qui permet de conserver les différents échantillonnages du modèle bayésien et leurs coûts. Le modèle est construit sur la base que nous avions utilisé pour le LSTM simple, avec un changement au niveau de la couche LSTM de pytorch, substituée par une couche BayesianLSTM et adaptée à la syntaxe de BLiTZ.
+
+La fonction train est également adaptée, et on y rajoute une méthode *"sample_elbo"* qui permet de calculer le changement des paramètres et le loss du training pour divers échantillons (nombre d'échantillons choisi manuellement).
+
+Enfin, pour la phase de test (modèle entraîné) les prédictions du modèle sont aussi calculées pour les différents échantillons. Les prédictions et paramètres ρ et μ du modèle nous permettent de calculer des bornes et une moyenne pour chaque valeur prédite, à l'aide de la fonction implémentée *get_confidence_intervals*.
+
+Cette fonction calcule les bornes et la moyenne ainsi, avec le coefficient de confiance CI multiplier :
+
+    pred_mean = preds_test.mean(0)
+    pred_std = preds_test.std(0).detach().cpu().numpy()
+    
+    pred_std = torch.tensor((pred_std))
+    
+    upper_bound = pred_mean + (pred_std * ci_multiplier)
+    lower_bound = pred_mean - (pred_std * ci_multiplier)
+
+On obtient aussi des prédictions dont la certitude est exprimée pour la phase de test.
+
+
 
 #### Métriques utilisées, mesure de la qualité de la performances de l'algorithme
 
@@ -182,7 +206,33 @@ Pour le bayesian lstm, je parlerai de mon loss (mse et sampler) dans ma partie -
 
 ## Résultats
 
-Nos ressources en calcul étant limité, nous sommes conscient que nous avon souvent pratiqué de "early stopping", car nous ne pouvions pas forcément nous permettre de passer autant de temps à entrainer un réseau de neurones.
+Nos ressources en calcul étant limité, nous sommes conscient que nous avons souvent pratiqué l'*early stopping*, car nous ne pouvions pas forcément nous permettre de passer autant de temps à entrainer un réseau de neurones.
+
+#### Bayesian LSTM
+
+Pour le modèle LSTM bayesien, le modèle sélectionné a été entrainé avec les paramètres et hyperparamètres suivants :
+
+| Paramètre/hyperparamètre | Valeur                                                       |
+| ------------------------ | ------------------------------------------------------------ |
+| Input_dim                | 7 jours x 24 x 4 (nombre de valeurs relevées par le radar pour 7 jours) |
+| Hidden_dim               | 70                                                           |
+| Output_dim               | 1 jour x 24 x 4 (nombre de valeurs à prédire pour 1 jour)    |
+| Learning rate            | 0.001                                                        |
+| Nb of epochs             | 100                                                          |
+
+Les 100 epochs prennent environ 3 minutes pour ce modèle et nous pourrions envisager d'entrainer un peu plus longtemps ou en faisant varier l'hidden_dim pour prendre en compte plus de features. L'entrainement de 700 epochs testé n'ayant pas apporté de précisions beaucoup plus flagrantes, nous avons décidé de continuer avec 100 epochs pour ce modèle.
+
+La particularité de la méthode sample_elbo utilisée dans le train construit des valeurs de loss_train très élevées, mais qui diminuent au fil des itérations.
+
+<img src="image/loss_bayesian.png" width="400px" height="550px">
+
+On remarque également que le loss de la validation diminue fortement mais reste un peu instable par la suite. Essayer de faire tourner ce modèle sur des datasets différents pourrait potentiellement donner des résultats un peu meilleurs, même si l'allure générale de l'évolution du loss démontre déjà un certain apprentissage effectué.
+
+Les résultats sont intéressants du fait de la visualisation du l'intervalle de confiance calculé :
+
+<img src="image/image_interval_bayesian2.png">
+
+<img src="image/image_interval_bayesian.png">
 
 ## Résultats et analyse
 

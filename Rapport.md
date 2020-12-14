@@ -46,15 +46,16 @@ Décrire pourquoi on en supprime certaines
 
 | Nom de la colonne | Description | Nombre d'entités | Remarques particulieres |
 | ----------------- | ----------- |----------------- | ----------------------- |
+| Global date | dates et heures détaillées | 71599 |  |
 | Location     | string, Nom du radar, un nom correspond à une localisation précise | 23  |    |
-| location_latitude | latitude de la position du radar |    |    |
-| location_logitude | logitude de la position du radar |    |    |
-| Year | Année d'acquisition |    |    |
-| Month | Mois d'acquisition |    |    |
-| Day | Jours d'acquisition |    |    |
-| Day of Week | Jours de la semaine, entier allant de de 0 à 6 |    |    |
-| Direction | None, NB ou *** , indique la direction du passage des voitures compté par le radar |    |    |
-| Volume| Nombre refletant le passage des voitures au niveau du radar entre deux instants|    |    |
+| location_latitude | latitude de la position du radar | 18 |    |
+| location_longitude | longitude de la position du radar | 18 |    |
+| Year | Année d'acquisition | 3 |    |
+| Month | Mois d'acquisition | 12 |    |
+| Day | Jours d'acquisition | 31 |    |
+| Day of Week | Jours de la semaine, entier allant de de 0 à 6 | 7 |    |
+| Direction | None, NB ou *** , indique la direction du passage des voitures compté par le radar | 5 |    |
+| Volume| Nombre refletant le passage des voitures au niveau du radar entre deux instants| 256 |    |
 
 Nous remarquons également des irrégularités pour des données, il est possible que certaines données manque. Ils existent de temps en temps pour un même radar, dans la même direction, à la même exacte heure deux données de volume différentes. Dans ce cas là nous sommerons les deux volumes obtenues. Par ailleurs, il peut arriver que les données manquent totalement sur une journée ou bien juste le temps d'une acquisition (il y aura alors une différence de 30 minutes entre deux acquisition). Travaillant avec des données temporelles, nous souhaitons avoir exactement le même échantillonage des données, ce qui nous menera à faire l'algorithme suivant de sélection des données : 
 

@@ -103,37 +103,45 @@ Hyper-paramètres qu'on a choisit
 
 ce modèle a été facile à implémenter et à tester, cependant il manque de finesse. Tout d'abord l'inclusion de features n'est pas prévu. 
 
-#### Encoder-decoder
+#### LSTM Encoder-decoder
 
-Nous avons cherché à étudier un second modèle encodeur décodeur ou *seq2seq* qui correspond à la concaténation de deux modèles : 
+Nous avons cherché à étudier un second modèle encodeur décodeur ou *seq2seq* qui correspond à la concaténation de deux modèles : un modèle encodeur et un modèle décodeur
 
-- un modèle encodeur qui encode une séquence en un vecteur de longueur fixe. Ce modèle est constitué d'une succession de blocs récurent, dans notre cas des blocs LSTM. Chaque "bloc" prend en entrée un élément de la séquence et le propage. Le *hidden state* est calculée de la manière suivant 
+##### Modèle encodeur
 
-  $h_t=f(W^{(hh)}h_{t-1})$
+Le modèle encodeur encode une séquence en un vecteur de longueur fixe. Ce modèle est constitué d'une succession de blocs récurent, dans notre cas des blocs LSTM. Chaque "bloc" prend en entrée un élément de la séquence et le propage. Le *hidden state* à chaque t est calculée de la manière suivante: 
 
-  
+<img src="image/formule_hidden_state_encoder.png" style="zoom:30%;" />
 
-- un modèle décodeur qui décode un vecteur de longueur fixe et prédit une séquence
+Le *hidden state* final, à la sortie du dernier blocs LSTM, est un vecteur qui encapsule des informations provenant de tous les éléments de la séquence d'entrée et aidera le décodeur à prédire de manière précise la séquence de sortie.
 
+Le *hidden state* de sortie de l'encodeur correspondra à au *hidden state* en entrée du modèle de décodeur.  
 
+##### Modèle décodeur
 
-La transmission entre 
+Le modèle décodeur décode un vecteur de longueur fixe et prédit une séquence. Ce modèle est constitué d'une succession de blocs, un bloc par élément à prédire. Chaque bloc prend en entrée le *hidden state*, ainsi que la prédiction du bloc précédent et produit un *hidden state* ainsi qu'une prédiction. 
 
-Un second modèle a été implémenté pour pouvoir répondre aux problèmes précédents. Connu pour son utilisation et son efficacité lors du traitement de time series, AJOUTER QQL SOURCES
+##### Teacher forcing
 
-Le modèle lstm encoder-decoder repose l'association de deux modèles : encoder/decoder. 
+Il peut être difficile d'entrainer un modèle seq2seq*, car initiallement les prédictions faites par chacun des blocs du décodeur sont non précises, et sont prises en compte pour la prédiction du blocs suivant. 
+
+Pour faciliter la convergence du modèle lors de l'entrainement, la méthode de *teacher forcing* peut petre utilisé.  Au sein du décodeur, au lieu d'utiliser la prédiction du blocs précédent (prédiction à t-1) pour calculer une sortie à t, la valeur de la vérité terrain à t-1 est utilisée. 
 
 <img src="image/encoder_decoder.png">
 
 [Image de *Video Prediction using Deep Learning and PyTorch (-lightning)* article](https://towardsdatascience.com/video-prediction-using-convlstm-with-pytorch-lightning-27b195fd21a2)
 
-Le modèle encoder est similaire au modèle LSTM-simple. Pour le décodeur, pour chaque du vecteur en sortie de la séquence
-
-Expliquer le principe du teacher forcing
-
 
 
 ##### Ajout de features
+
+
+
+Pour le moment tous les modèles que nous avons choisit ne prennent qu'en entrée les données Volumes temporelles. Il existent des modèles encodeur, décodeur où il est possible d'ajouter des features afin de rendre les prédictions plus précises. 
+
+Par exemple, nous avons remarqué lors de l'analyse des données que le Volume de voiture variait en fonction du jour de la semaine. Ainsi rajouter ces informations lors du features d'entrée pourraient être améliorer la précision du modèle. 
+
+En ajoutant des features,  comme le jour de la semaine, il sera possible de diminuer la taille des données d'entrée en nombre de ligne par exemple. On pourra faire une séquence d'entrée avec d'un jour et souhaiter prédire le jour suivant par exemple. 
 
 <img src="image/encode_decoder_features.png">
 

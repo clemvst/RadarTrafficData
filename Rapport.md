@@ -100,13 +100,21 @@ Enfin à partir ce ces datasets, juste avant l'entrainement nous les diviserons 
 
 #### LSTM-simple
 
-Le premier modèle repose sur le module LSTM  (je vais essayer de faire cette partie - clem)
+Le premier modèle repose sur le module LSTM (*Long Short-Term Memory*). Cette couche est composée de trois “portes” qui gèrent les différentes informations. On a également deux types de sorties.
 
-Inclure description schéma
+- Forget gate
+- Input gate
+- Output gate
+- Hidden state 
+- Cell state
 
-Hyper-paramètres qu'on a choisit
+<img src="image/lstm_schema.png">
 
-ce modèle a été facile à implémenter et à tester, cependant il manque de finesse. Tout d'abord l'inclusion de features n'est pas prévu. 
+
+
+Les opérations dans les portes permettent au LSTM de garder et filtrer certaines informations en mémoire. Dans une phrase écrite par exemple, la couche LSTM va garder le sens principal de la phrase et supprimer les mots qui importent peu comme les déterminants ou certains connecteurs.
+
+Ici, le but est de mettre en évidence la tendance qui se dégage dans la série temporelle. Ce modèle a été facile à implémenter et à tester, cependant il manque de finesse et peut-être que son architecture pourrait être développée davantage. L'inclusion des features n'est pas prévu dans notre modèle et cela pourrait être une piste d'amélioration.
 
 #### LSTM Encoder-decoder
 

@@ -104,6 +104,20 @@ ce modèle a été facile à implémenter et à tester, cependant il manque de f
 
 #### Encoder-decoder
 
+Nous avons cherché à étudier un second modèle encodeur décodeur ou *seq2seq* qui correspond à la concaténation de deux modèles : 
+
+- un modèle encodeur qui encode une séquence en un vecteur de longueur fixe. Ce modèle est constitué d'une succession de blocs récurent, dans notre cas des blocs LSTM. Chaque "bloc" prend en entrée un élément de la séquence et le propage. Le *hidden state* est calculée de la manière suivant 
+
+  $h_t=f(W^{(hh)}h_{t-1})$
+
+  
+
+- un modèle décodeur qui décode un vecteur de longueur fixe et prédit une séquence
+
+
+
+La transmission entre 
+
 Un second modèle a été implémenté pour pouvoir répondre aux problèmes précédents. Connu pour son utilisation et son efficacité lors du traitement de time series, AJOUTER QQL SOURCES
 
 Le modèle lstm encoder-decoder repose l'association de deux modèles : encoder/decoder. 

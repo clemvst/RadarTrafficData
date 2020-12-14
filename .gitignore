@@ -2,5 +2,7 @@
 /models/model2.pt
 **/*.pt
 *.pt
-
+*.ipynb
+*/.ipynb
 /.ipynb_checkpoints/
+*/notebooks/

@@ -51,18 +51,18 @@ Chaque radar fournit des données toutes les 15 minutes. Chaque nouvel apport de
 | Month | Mois d'acquisition | 12 |    |
 | Day | Jours d'acquisition | 31 |    |
 | Day of Week | Jours de la semaine, entier allant de de 0 à 6 | 7 |    |
-| Direction | None, NB ou *** , indique la direction du passage des voitures compté par le radar | 5 |    |
+| Direction | ['None', 'NB', 'SB', 'EB', 'WB'] indique la direction du passage des voitures compté par le radar | 5 |    |
 | Volume| Nombre refletant le passage des voitures au niveau du radar entre deux instants| 256 |    |
 
 Nous remarquons également des irrégularités pour des données, il est possible que certaines données manque. Ils existent de temps en temps pour un même radar, dans la même direction, à la même exacte heure deux données de volume différentes. Dans ce cas là nous sommerons les deux volumes obtenues. Par ailleurs, il peut arriver que les données manquent totalement sur une journée ou bien juste le temps d'une acquisition (il y aura alors une différence de 30 minutes entre deux acquisition). Travaillant avec des données temporelles, nous souhaitons avoir exactement le même échantillonage des données, ce qui nous menera à faire l'algorithme suivant de sélection des données : 
 
 ** Décrire l'algorithme, éventuellement, avec un schéma **
 
-IMPORTANT Expliquer que volume est la variable d'intérêt, et quels autres variables pourraient servir comme feautures à ajouter ex: Day of the Week, Mois de l'année
+IMPORTANT Expliquer que volume est la variable d'intérêt
 
 #### Visualisation des données
 
-Nous étudions ensuite les données pour un seul radar : <u>'CAPITAL OF TEXAS HWY / LAKEWOOD DR'</u> en direction NB. Nous souhaitons rapidement, étudier une probable périodicité journalière des données d'une même année.  Nous remarquons pour les jours 0 et 6, l'évolution du volume moyen se distingue des jours 1,2,3, 4 et 5. Ainsi il paraît important de transmettre des informations sur le jour de la semaine au réseaux de neurones. 
+Nous étudions ensuite les données pour un seul radar : ' CAPITAL OF TEXAS HWY / LAKEWOOD DR' en direction NB. Nous souhaitons rapidement, étudier une probable périodicité journalière des données d'une même année. Nous remarquons pour les jours 0 et 6 (respectivement samedi et dimanche), l'évolution du volume moyen se distingue des autre jours de la semaine 1,2,3, 4 et 5. Ainsi il paraît important de transmettre des informations sur le jour de la semaine au réseaux de neurones. 
 
 <img src="image/lakewood_mean_behavior_dayofweek_2018.png">
 
@@ -70,8 +70,8 @@ Ensuite nous nous intéressons au volume moyen, par jour de la semaine, détect�
 
 <img src="image/Mean_volume_perday_2018.png">
 
-On agrège les données ayant la même exacte date d'acquisition.
-**insérer graph de image Analyser graph de imagerepertoiree**
+
+
 
 #### Préparation des datasets
 
@@ -84,7 +84,7 @@ Le traitement des données a été fait de manière à pouvoir choisir la taille
 |  |  |  | ** | 1 mois de données | 1 semaine de données |  |
 |                        |                 |           |                         |                        |                      |                      |
 
-Puisque nous ne possédions pas de ressource type gpu pour entrainer nos réseaux de neurones, nous avons délibéremment choisit de ne pas construire des datasets avec une forte variabilité de données : selection de données provenant d'un seul radar, de la même année.  
+
 
 Enfin à partir ce ces datasets, juste avant l'entrainement nous les diviserons en trois sous datasets : entrainement, validation et test avec respectivement 80% , 5% et 15% des données.
 
@@ -110,7 +110,9 @@ ce modèle a été facile à implémenter et à tester, cependant il manque de f
 
 #### LSTM Encoder-decoder
 
-Nous avons cherché à étudier un second modèle encodeur décodeur ou *seq2seq* qui correspond à la concaténation de deux modèles : un modèle encodeur et un modèle décodeur
+Nous avons cherché à étudier un second modèle encodeur décodeur ou *seq2seq* qui correspond à la concaténation de deux modèles : un modèle encodeur et un modèle décodeur. Nous nous sommes inspirés de l'implémentation sous pytorch du modèle [lstm_encoder_decoder](https://github.com/lkulowski/LSTM_encoder_decoder/blob/master/code/lstm_encoder_decoder.py) développé par Ikulowski sur disponible sur github.
+
+
 
 <img src="image/encoder_decoder.png">
 
@@ -234,17 +236,26 @@ Nous avons également visualisé les prédictions effectué par ce modèle :
 
 ​			<u>Prédictions simple-model LSTM sur le dataset de test de Dataset0</u>
 
+
+
 ### Encodeur-décodeur
 
-L'entrainement de ce réseau de neurones a été particulièrement difficile et couteux en temps. L'entrainement étant long, nous avons travaillé avec un petit dataset pour ce réseau : le Dataset1, décrit dans la section *préparation des datasets*. Rapidement le réseaux de neurone ne produit qu'une seule et même prédiction, peut importe les données d'entrée. La méthode de teacher forcing ainsi que la modification du learning rate pour des valeurs entre 0.001 et 0.01 n'ont pas résolu ce problème.
+L'entrainement de ce réseau de neurones a été particulièrement difficile et couteux en temps. L'entrainement étant long, nous avons travaillé avec un petit dataset pour ce réseau : le Dataset1, décrit dans la section *préparation des datasets*. 
+
+Avec une méthode de *teacher forcing*, un learning rate à 0.001, la dimension de *hidden state* de 64 et 300 epochs d'entrainement les prédictions en test obtenus sont les suivantes : 
 
 
 
-<img src="image/test_encoder_decoder.png" alt="test_encoder_decoder" style="zoom:75%;" /><img src="image/test_encoder_decoder.png" alt="test_encoder_decoder" style="zoom:75%;" />
+<img src="image/test_encoder_decoder.png" alt="test_encoder_decoder" style="zoom:75%;" /><img src="image/test2_encoder_decoder.png" alt="test_encoder_decoder" style="zoom:75%;" />
 
-​									<u>Prédictions de encoder-decoder sur le dataset de Test de dataset1</u> 
+​								<u>Prédictions de encoder-decoder sur le dataset de Test de dataset1</u> 
 
 Puisque les résultats sans features n'étaient pas satisfaisant et le temps d'entrainement lent (30 minutes pour 100 epochs) , nous n'avons pas cherché à complexifier le modèle avec des features et à l'entrainer.
+![loss_val_encoder-decoder](image/loss_val_encoder-decoder.png)
+
+​		<u>Évolution de la loss sur le dataset de validation lors de l'entrainement du modèle encodeur-décodeur</u>
+
+Puisque les résultats sans features n'étaient pas satisfaisant et le temps d'entrainement lent ( jusqu'à 40 minutes pour 300 epochs) , nous n'avons pas cherché à complexifier le modèle avec des features et à l'entrainer.
 
 
 
@@ -284,11 +295,21 @@ Puisque nous ne possédions pas de ressources réellement suffisantes nous somme
 
 L'étude de la variation de loss pour le simple LSTM model, montre bien un phase d'aprentissage. Nous avons une décroissance de la loss pour le dataset de train et de validation avec l'atteinte d'un potentiel plateau.
 
-De plus, l'observation des prédictions montre une certaine cohérence avec la vérité terrain. Cependant, la valeur de la loss dans le dataset d'entrainement étant bien plus faible que pour le dataset de validation.  La visualisation des prédictions sur les données d'entrainement ne montre pas cependant une situation d'overfitting. Il aurait peut être été interessant de laisser l'entrainement se faire sur un plus grande nombre d'epoch. 
+De plus, l'observation des prédictions montre une certaine cohérence avec la vérité terrain. Cependant, la valeur de la loss dans le dataset d'entrainement étant bien plus faible que pour le dataset de validation.  La visualisation des prédictions sur les données d'entrainement ne montre pas cependant une situation d'overfitting. 
+
+<img src="image/trainpred_simple_model.png" style="zoom:67%;" /><img src="image/trainpred2_simplemodel.png" alt="trainpred2_simplemodel" style="zoom:67%;" />
+
+<u>Prédictions de simple_model sur le dataset de train du dataset0</u>
+
+Il aurait peut être été interessant de laisser l'entrainement se faire sur un plus grande nombre d'epoch. 
 
 ### Encodeur-décodeur
 
-Les résultats obtenus avec le modèle encodeur-decodeur actuel ne sont pas réellement satisfaisant, puisque non représentatif de la réalité. Le fait que le réseau à un moment de donne qu'une seule prédiction peut s'explique pour différentes raison
+Les résultats obtenus avec le modèle encodeur-decodeur actuel ne sont pas réellement satisfaisant, puisque non représentatif de la réalité. L'étude de la variation de la loss sur le dataset de validation montre bien un soucis dans l'entrainement :  il n'y a pas de phénomène de décroissance de la loss. 
+
+Les causes de ces mauvaises performances peuvent être l'arrêt trop tôt de l'entrainement ou *early stopping*empéchant le modèle de converger ou un mauvais réglage des hyperparamètres. 
+
+
 
 ## Conclusion
 

@@ -23,7 +23,7 @@ Data: Kaggle "Radar Traffic Data. Traffic data collected from radar sensors depl
 - Most important: modeling, training, evaluating
 
 ## Introduction
-Pour la construction de notre projet, nous avons procédé en plusieurs étapes : une première analyse des données, afin de comprendre leur construction et leur répartition, puis la mise en place d'un traitement de ces données pour créer des inputs de taille et de nature convenables pour prédire en série temporelle. Enfin, nous sommes passées à une grande phase d'expérimentation et nous avons choisi de tester plusieurs réseaux de deep learning, nous avons fait varier les paramètres ou hyperparamètres, nous avons joué sur le dataset et essayé de tirer des conclusions quant aux prédictions temporelles obtenues. Nos fonctions ou classes python principales sont organisées dans des fichiers .py et nos expérimentations dans des notebooks .ipynb. 
+Pour la construction de notre projet, nous avons procédé en plusieurs étapes : une première analyse des données, afin de comprendre leur construction et leur répartition, puis la mise en place d'un traitement de ces données pour créer des inputs de taille et de nature convenables pour prédire en série temporelle. Enfin, nous sommes passées à une grande phase d'expérimentation et nous avons choisi de tester plusieurs réseaux de deep learning, nous avons fait varier les paramètres ou hyperparamètres, nous avons joué sur le dataset et essayé de tirer des conclusions quant aux prédictions temporelles obtenues. Nos fonctions ou classes python principales sont organisées dans des fichiers .py et nos expérimentations dans des notebooks .ipynb. Une fonction main.py permet d'ouvrir les data, lancer le processing de son choix, entrainer le modèle, ajuster les paramètres.
 
 
 
@@ -39,14 +39,11 @@ Chaque radar fournit des données toutes les 15 minutes. Chaque nouvel apport de
  - le nombre de voitures détectées
 
 
-Décrire le nombre d'entités dans les colonnes
-
-Décrire pourquoi on en supprime certaines
 
 
 | Nom de la colonne | Description | Nombre d'entités | Remarques particulieres |
 | ----------------- | ----------- |----------------- | ----------------------- |
-| Global date | dates et heures détaillées | 71599 |  |
+| Global date | Dates et heures détaillées | 71599 |  |
 | Location     | string, Nom du radar, un nom correspond à une localisation précise | 23  |    |
 | location_latitude | latitude de la position du radar | 18 |    |
 | location_longitude | longitude de la position du radar | 18 |    |
@@ -65,7 +62,7 @@ IMPORTANT Expliquer que volume est la variable d'intérêt, et quels autres vari
 
 #### Visualisation des données
 
-Nous étudions ensuite les données pour un seul radar : ' CAPITAL OF TEXAS HWY / LAKEWOOD DR' en direction NB. Nous souhaitons rapidement, étudier une probable périodicité journalière des données d'une même année.  Nous remarquons pour les jours 0 et 6, l'évolution du volume moyen se distingue des jours 1,2,3, 4 et 5. Ainsi il paraît important de transmettre des informations sur le jour de la semaine au réseaux de neurones. 
+Nous étudions ensuite les données pour un seul radar : <u>'CAPITAL OF TEXAS HWY / LAKEWOOD DR'</u> en direction NB. Nous souhaitons rapidement, étudier une probable périodicité journalière des données d'une même année.  Nous remarquons pour les jours 0 et 6, l'évolution du volume moyen se distingue des jours 1,2,3, 4 et 5. Ainsi il paraît important de transmettre des informations sur le jour de la semaine au réseaux de neurones. 
 
 <img src="image/lakewood_mean_behavior_dayofweek_2018.png">
 
@@ -247,15 +244,11 @@ L'entrainement de ce réseau de neurones a été particulièrement difficile et 
 
 ​									<u>Prédictions de encoder-decoder sur le dataset de Test de dataset1</u> 
 
-
-
-**Insérer graphique et prédictions**
-
 Puisque les résultats sans features n'étaient pas satisfaisant et le temps d'entrainement lent (30 minutes pour 100 epochs) , nous n'avons pas cherché à complexifier le modèle avec des features et à l'entrainer.
 
 
 
-#### Bayesian LSTM
+### Bayesian LSTM
 
 Pour le modèle LSTM bayesien, le modèle sélectionné a été entrainé avec les paramètres et hyperparamètres suivants :
 

@@ -107,6 +107,12 @@ ce modèle a été facile à implémenter et à tester, cependant il manque de f
 
 Nous avons cherché à étudier un second modèle encodeur décodeur ou *seq2seq* qui correspond à la concaténation de deux modèles : un modèle encodeur et un modèle décodeur
 
+<img src="image/encoder_decoder.png">
+
+[Image de *Video Prediction using Deep Learning and PyTorch (-lightning)* article](https://towardsdatascience.com/video-prediction-using-convlstm-with-pytorch-lightning-27b195fd21a2)
+
+
+
 ##### Modèle encodeur
 
 Le modèle encodeur encode une séquence en un vecteur de longueur fixe. Ce modèle est constitué d'une succession de blocs récurent, dans notre cas des blocs LSTM. Chaque "bloc" prend en entrée un élément de la séquence et le propage. Le *hidden state* à chaque t est calculée de la manière suivante: 
@@ -123,25 +129,23 @@ Le modèle décodeur décode un vecteur de longueur fixe et prédit une séquenc
 
 ##### Teacher forcing
 
-Il peut être difficile d'entrainer un modèle seq2seq*, car initiallement les prédictions faites par chacun des blocs du décodeur sont non précises, et sont prises en compte pour la prédiction du blocs suivant. 
+Il peut être difficile d'entrainer un modèle *seq2seq*, car initiallement les prédictions faites par chacun des blocs du décodeur sont non précises, et sont prises en compte pour la prédiction du blocs suivant. 
 
-Pour faciliter la convergence du modèle lors de l'entrainement, la méthode de *teacher forcing* peut petre utilisé.  Au sein du décodeur, au lieu d'utiliser la prédiction du blocs précédent (prédiction à t-1) pour calculer une sortie à t, la valeur de la vérité terrain à t-1 est utilisée. 
+Pour faciliter la convergence du modèle lors de l'entrainement, la méthode de *teacher forcing* peut être utilisé.  Au sein du décodeur, au lieu d'utiliser la prédiction du blocs précédent (prédiction à t-1) pour calculer une sortie à t, la valeur de la vérité terrain à t-1 est utilisée. 
 
-<img src="image/encoder_decoder.png">
+<img src="image/teacher_forcing.png" alt="teacher_forcing" style="zoom:50%;" />
 
-[Image de *Video Prediction using Deep Learning and PyTorch (-lightning)* article](https://towardsdatascience.com/video-prediction-using-convlstm-with-pytorch-lightning-27b195fd21a2)
+[Translation or Answering tool: seq2seq with teacher forcing and attention mechanism](https://medium.com/@vivekvscool/translation-or-answer-tool-seq2seq-with-teacher-forcing-and-attention-mechanism-7cfd9cb03b3a)
 
 
 
 ##### Ajout de features
 
+Pour le moment tous les modèles que nous avons choisit ne prennent qu'en entrée les données *Volumes* temporelles du jeux de données. Il existent des modèles encodeur-décodeur où il est possible d'ajouter des features afin de rendre les prédictions plus précises. 
 
+Par exemple, nous avons remarqué lors de l'analyse des données que le Volume de voiture variait en fonction du jour de la semaine. Ainsi rajouter ces informations lors du features d'entrée pourraient améliorer la précision du modèle. 
 
-Pour le moment tous les modèles que nous avons choisit ne prennent qu'en entrée les données Volumes temporelles. Il existent des modèles encodeur, décodeur où il est possible d'ajouter des features afin de rendre les prédictions plus précises. 
-
-Par exemple, nous avons remarqué lors de l'analyse des données que le Volume de voiture variait en fonction du jour de la semaine. Ainsi rajouter ces informations lors du features d'entrée pourraient être améliorer la précision du modèle. 
-
-En ajoutant des features,  comme le jour de la semaine, il sera possible de diminuer la taille des données d'entrée en nombre de ligne par exemple. On pourra faire une séquence d'entrée avec d'un jour et souhaiter prédire le jour suivant par exemple. 
+En ajoutant des features,  comme le jour de la semaine, il sera par exemple probablement possible de diminuer la taille des données d'entrée (en nombre de données temporelles).  Il est également possible de penser qu'avec un modèle prenant en compte les features, le modèle pourra s'entrainer et prédire correctement sur des données provenant de radar différents, si la variable qualitative *nom du radar* est pris en compte en entrée du réseau. 
 
 <img src="image/encode_decoder_features.png">
 

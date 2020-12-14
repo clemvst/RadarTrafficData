@@ -24,7 +24,7 @@ def load_from_checkpoint(model, optimizer, path_checkpoint):
 
 
 def train(model, trainloader, valloader, lr: float, n_epochs: int, name_model="model", device=None, ite_print=10,
-          save=True, is_bayes=False) -> Tuple[list, list, list]:
+          save=True, is_bayes=False, sample_nbr=3) -> Tuple[list, list, list]:
     """
     Trains a chosen model with given training and validation datasets and hyperparameters
     
@@ -37,6 +37,7 @@ def train(model, trainloader, valloader, lr: float, n_epochs: int, name_model="m
     :param ite_print: path of iterations to print (ex: print every 5 epochs)
     :param save: Boolean to choose to save the model or not
     :param is_bayes: Boolean to choose to use the bayesian sampling or not
+    :param sample_nbr: number of samples for bayesian sampling
     
     :return: tuple with list of epochs iterations, list of train loss values, list of val loss values
 
@@ -59,7 +60,7 @@ def train(model, trainloader, valloader, lr: float, n_epochs: int, name_model="m
                 single_loss = model.sample_elbo(inputs=seq.float(),
                                                 labels=labels.float(),
                                                 criterion=loss_function,
-                                                sample_nbr=1)
+                                                sample_nbr=sample_nbr)
             
             else:
                 model.hidden_cell = (torch.zeros(1, 1, model.hidden_layer_size),

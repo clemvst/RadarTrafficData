@@ -23,7 +23,7 @@ Data: Kaggle "Radar Traffic Data. Traffic data collected from radar sensors depl
 - Most important: modeling, training, evaluating
 
 ## Introduction
-Pour la construction de notre projet, nous avons procédé en plusieurs étapes : une première analyse des données, afin de comprendre leur construction et leur répartition, puis la mise en place d'un traitement de ces données pour créer des inputs de taille et de nature convenables pour prédire en série temporelle. Enfin, nous sommes passées à une grande phase d'expérimentation et nous avons choisi de tester plusieurs réseaux de deep learning, nous avons fait varier les paramètres ou hyperparamètres, nous avons joué sur le dataset et essayé de tirer des conclusions quant aux prédictions temporelles obtenues. Nos fonctions ou classes python principales sont organisées dans des fichiers .py et nos expérimentations dans des notebooks .ipynb. 
+Pour la construction de notre projet, nous avons procédé en plusieurs étapes : une première analyse des données, afin de comprendre leur construction et leur répartition, puis la mise en place d'un traitement de ces données pour créer des inputs de taille et de nature convenables pour prédire en série temporelle. Enfin, nous sommes passées à une grande phase d'expérimentation et nous avons choisi de tester plusieurs réseaux de deep learning, nous avons fait varier les paramètres ou hyperparamètres, nous avons joué sur le dataset et essayé de tirer des conclusions quant aux prédictions temporelles obtenues. Nos fonctions ou classes python principales sont organisées dans des fichiers .py et nos expérimentations dans des notebooks .ipynb. Une fonction main.py permet d'ouvrir les data, lancer le processing de son choix, entrainer le modèle, ajuster les paramètres.
 
 
 
@@ -43,7 +43,7 @@ Chaque radar fournit des données toutes les 15 minutes. Chaque nouvel apport de
 
 | Nom de la colonne | Description | Nombre d'entités | Remarques particulieres |
 | ----------------- | ----------- |----------------- | ----------------------- |
-| Global date | dates et heures détaillées | 71599 |  |
+| Global date | Dates et heures détaillées | 71599 |  |
 | Location     | string, Nom du radar, un nom correspond à une localisation précise | 23  |    |
 | location_latitude | latitude de la position du radar | 18 |    |
 | location_longitude | longitude de la position du radar | 18 |    |
@@ -246,6 +246,7 @@ Avec une méthode de *teacher forcing*, un learning rate à 0.001, la dimension 
 
 ​								<u>Prédictions de encoder-decoder sur le dataset de Test de dataset1</u> 
 
+Puisque les résultats sans features n'étaient pas satisfaisant et le temps d'entrainement lent (30 minutes pour 100 epochs) , nous n'avons pas cherché à complexifier le modèle avec des features et à l'entrainer.
 ![loss_val_encoder-decoder](image/loss_val_encoder-decoder.png)
 
 ​		<u>Évolution de la loss sur le dataset de validation lors de l'entrainement du modèle encodeur-décodeur</u>
@@ -254,7 +255,7 @@ Puisque les résultats sans features n'étaient pas satisfaisant et le temps d'e
 
 
 
-#### Bayesian LSTM
+### Bayesian LSTM
 
 Pour le modèle LSTM bayesien, le modèle sélectionné a été entrainé avec les paramètres et hyperparamètres suivants :
 

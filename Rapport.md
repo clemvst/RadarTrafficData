@@ -212,21 +212,25 @@ Nous avons également visualisé les prédictions effectué par ce modèle :
 
 ​			<u>Prédictions simple-model LSTM sur le dataset de test de Dataset0</u>
 
+
+
 ### Encodeur-décodeur
 
-L'entrainement de ce réseau de neurones a été particulièrement difficile et couteux en temps. L'entrainement étant long, nous avons travaillé avec un petit dataset pour ce réseau : le Dataset1, décrit dans la section *préparation des datasets*. Rapidement le réseaux de neurone ne produit qu'une seule et même prédiction, peut importe les données d'entrée. La méthode de teacher forcing ainsi que la modification du learning rate pour des valeurs entre 0.001 et 0.01 n'ont pas résolu ce problème.
+L'entrainement de ce réseau de neurones a été particulièrement difficile et couteux en temps. L'entrainement étant long, nous avons travaillé avec un petit dataset pour ce réseau : le Dataset1, décrit dans la section *préparation des datasets*. 
+
+Avec une méthode de *teacher forcing*, un learning rate à 0.001, la dimension de *hidden state* de 64 et 300 epochs d'entrainement les prédictions en test obtenus sont les suivantes : 
 
 
 
-<img src="image/test_encoder_decoder.png" alt="test_encoder_decoder" style="zoom:75%;" /><img src="image/test_encoder_decoder.png" alt="test_encoder_decoder" style="zoom:75%;" />
+<img src="image/test_encoder_decoder.png" alt="test_encoder_decoder" style="zoom:75%;" /><img src="image/test2_encoder_decoder.png" alt="test_encoder_decoder" style="zoom:75%;" />
 
-​									<u>Prédictions de encoder-decoder sur le dataset de Test de dataset1</u> 
+​								<u>Prédictions de encoder-decoder sur le dataset de Test de dataset1</u> 
 
+![loss_val_encoder-decoder](image/loss_val_encoder-decoder.png)
 
+​		<u>Évolution de la loss sur le dataset de validation lors de l'entrainement du modèle encodeur-décodeur</u>
 
-**Insérer graphique et prédictions**
-
-Puisque les résultats sans features n'étaient pas satisfaisant et le temps d'entrainement lent (30 minutes pour 100 epochs) , nous n'avons pas cherché à complexifier le modèle avec des features et à l'entrainer.
+Puisque les résultats sans features n'étaient pas satisfaisant et le temps d'entrainement lent ( jusqu'à 40 minutes pour 300 epochs) , nous n'avons pas cherché à complexifier le modèle avec des features et à l'entrainer.
 
 ## Discussion
 
@@ -236,11 +240,21 @@ Puisque nous ne possédions pas de ressources réellement suffisantes nous somme
 
 L'étude de la variation de loss pour le simple LSTM model, montre bien un phase d'aprentissage. Nous avons une décroissance de la loss pour le dataset de train et de validation avec l'atteinte d'un potentiel plateau.
 
-De plus, l'observation des prédictions montre une certaine cohérence avec la vérité terrain. Cependant, la valeur de la loss dans le dataset d'entrainement étant bien plus faible que pour le dataset de validation.  La visualisation des prédictions sur les données d'entrainement ne montre pas cependant une situation d'overfitting. Il aurait peut être été interessant de laisser l'entrainement se faire sur un plus grande nombre d'epoch. 
+De plus, l'observation des prédictions montre une certaine cohérence avec la vérité terrain. Cependant, la valeur de la loss dans le dataset d'entrainement étant bien plus faible que pour le dataset de validation.  La visualisation des prédictions sur les données d'entrainement ne montre pas cependant une situation d'overfitting. 
+
+<img src="image/trainpred_simple_model.png" style="zoom:67%;" /><img src="image/trainpred2_simplemodel.png" alt="trainpred2_simplemodel" style="zoom:67%;" />
+
+<u>Prédictions de simple_model sur le dataset de train du dataset0</u>
+
+Il aurait peut être été interessant de laisser l'entrainement se faire sur un plus grande nombre d'epoch. 
 
 ### Encodeur-décodeur
 
-Les résultats obtenus avec le modèle encodeur-decodeur actuel ne sont pas réellement satisfaisant, puisque non représentatif de la réalité. Le fait que le réseau à un moment de donne qu'une seule prédiction peut s'explique pour différentes raison
+Les résultats obtenus avec le modèle encodeur-decodeur actuel ne sont pas réellement satisfaisant, puisque non représentatif de la réalité. L'étude de la variation de la loss sur le dataset de validation montre bien un soucis dans l'entrainement :  il n'y a pas de phénomène de décroissance de la loss. 
+
+Pour justifier ces mauvaises performances, il est possible de considérer que l'entrainement a été fini beaucoup trop tôt empéchant le modèle de converger ou qu'il faille changer la valeur du learning rate.
+
+
 
 ## Conclusion
 

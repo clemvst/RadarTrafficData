@@ -39,9 +39,6 @@ Chaque radar fournit des données toutes les 15 minutes. Chaque nouvel apport de
  - le nombre de voitures détectées
 
 
-Décrire le nombre d'entités dans les colonnes
-
-Décrire pourquoi on en supprime certaines
 
 
 | Nom de la colonne | Description | Nombre d'entités | Remarques particulieres |
@@ -57,23 +54,21 @@ Décrire pourquoi on en supprime certaines
 | Direction | ['None', 'NB', 'SB', 'EB', 'WB'] indique la direction du passage des voitures compté par le radar | 5 |    |
 | Volume| Nombre refletant le passage des voitures au niveau du radar entre deux instants| 256 |    |
 
-Nous remarquons également des irrégularités pour des données, il est possible que certaines données manque. Ils existent de temps en temps pour un même radar, dans la même direction, à la même exacte heure deux données de volume différentes. Dans ce cas là nous sommerons les deux volumes obtenues. Par ailleurs, il peut arriver que les données manquent totalement sur une journée ou bien juste le temps d'une acquisition (il y aura alors une différence de 30 minutes entre deux acquisition). Travaillant avec des données temporelles, nous souhaitons avoir exactement le même échantillonage des données, ce qui nous menera à faire l'algorithme suivant de sélection des données : 
+La variable que nous chercherons à prédire est Volume car elle reflète le nombre de voiture qui passent devant le radar entre deux instants et est utile pour prédire la circulation au sein de la ville. 
 
-** Décrire l'algorithme, éventuellement, avec un schéma **
-
-IMPORTANT Expliquer que volume est la variable d'intérêt
+Nous remarquons également des irrégularités pour des données. Par exemple, ils existent également de temps en temps pour un même radar, dans la même direction, à la même exacte heure deux données de volume différentes. Dans ce cas là, nous sommerons les deux volumes obtenues. Par ailleurs, il peut arriver que les données manquent totalement sur une journée ou bien juste le temps d'une acquisition (il y aura alors une différence de 30 minutes entre deux acquisitions). Travaillant avec des données temporelles, nous souhaitons avoir exactement le même échantillonage des données. Nous serons ainsi amené lors de la construction de nos batch de données à remplacer par 0 la valeur d'une donnée si elle est absente, de manière isolée, ou alors supprimer complètement le batch dépendant d'un jour sans données. L'ensemble de nos fonction gérant l'analyse et la construction des datasets est contenu dans open_data.py.
 
 #### Visualisation des données
 
-Nous étudions ensuite les données pour un seul radar : ' CAPITAL OF TEXAS HWY / LAKEWOOD DR' en direction NB. Nous souhaitons rapidement, étudier une probable périodicité journalière des données d'une même année. Nous remarquons pour les jours 0 et 6 (respectivement samedi et dimanche), l'évolution du volume moyen se distingue des autre jours de la semaine 1,2,3, 4 et 5. Ainsi il paraît important de transmettre des informations sur le jour de la semaine au réseaux de neurones. 
+Nous étudions ensuite les données pour un seul radar : ' CAPITAL OF TEXAS HWY / LAKEWOOD DR' en direction NB. Nous souhaitons rapidement, étudier une probable périodicité journalière des données d'une même année.
 
 <img src="image/lakewood_mean_behavior_dayofweek_2018.png">
 
-Ensuite nous nous intéressons au volume moyen, par jour de la semaine, détecté par le radar CAPITAL OF TEXAS HWY / LAKEWOOD DR en direction NB, sur l'année 2018. 
+Ensuite nous nous visualisons au volume moyen, par jour de la semaine, détecté par le radar CAPITAL OF TEXAS HWY / LAKEWOOD DR en direction NB, sur l'année 2018. 
 
 <img src="image/Mean_volume_perday_2018.png">
 
-
+ Nous remarquons pour les jours 0 et 6 (respectivement samedi et dimanche), l'évolution du volume moyen se distingue des autre jours de la semaine 1,2,3, 4 et 5. Ainsi il paraît important de transmettre des informations sur le jour de la semaine au réseaux de neurones.  
 
 
 #### Préparation des datasets
@@ -84,10 +79,8 @@ Le traitement des données a été fait de manière à pouvoir choisir la taille
 | ----------------- |  ----------------- | ----------- | ----------- | ----------- | ----------- | ----------- |
 | Dataset0 | 1 | 1 | 1 an (2018) | 7 jours de données | 1 jours de données| |
 | Dataset1 | 1 | 1 | 4 mois (début 2018) | 7 jours de données | 1 jours de données | 42 |
-|  |  |  | ** | 1 mois de données | 1 semaine de données |  |
-|                        |                 |           |                         |                        |                      |                      |
 
-
+La construction des Dataset0 et Dataset1 est poussée par le fait qu'il semble y avoir une certaine répétitivité du phénomène par semaine. Ainsi on peut présumer que connaître la variation du volume de voiture pour ce radar la semaine d'avant le jour de prédiction nous aidera grandement. 
 
 Enfin à partir ce ces datasets, juste avant l'entrainement nous les diviserons en trois sous datasets : entrainement, validation et test avec respectivement 80% , 5% et 15% des données.
 
@@ -293,6 +286,10 @@ Les résultats sont intéressants du fait de la visualisation du l'intervalle de
 
 Puisque nous ne possédions pas de ressources réellement suffisantes nous sommes conscient que les résultats ne sont pas réellement représentatifs de ce que ces modèles pourrait prédire en réalité. Par exemple, les performances décevantes du modèle encodeur décodeur peuvent s'explique par le faible nombre d'epoch utilisé pour l'entrainement. De plus, le temps d'entrainement des réseaux limitent également la recherche d'hyper-paramètre. Quelques essais de variations du learning rate ont été fait, mais il aurait pu être intéressant pour chaque modèle de faire varier le taille du vecteur *hidden state* et  le nombre de couche LSTM utilisé. 
 
+### Jeux de données
+
+Nous avons eu des difficulté à entrainer le réseaux de neurones du fait de notre grand nombre de données et faible capacité de nos ordinateurs. Comme nous avions remarqué une certaine répétitive de la variable volume de manière hebdomadaire, il aurait pu être intéressant d'utiliser plutôt uniquement les données à Jour-7 pour prédire au Jours J, ou même J-14, J-7 pour prédire au jour J. 
+
 ### Simple LSTM model
 
 L'étude de la variation de loss pour le simple LSTM model, montre bien un phase d'aprentissage. Nous avons une décroissance de la loss pour le dataset de train et de validation avec l'atteinte d'un potentiel plateau.
@@ -315,3 +312,4 @@ Les causes de ces mauvaises performances peuvent être l'arrêt trop tôt de l'e
 
 ## Conclusion
 
+Le modèle idéal : prend en information : jour de la semaine, vacances scolaires, jours férié, mois de l'année, le nom du radar, la direction et donne le résultat. 

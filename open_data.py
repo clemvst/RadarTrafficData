@@ -80,16 +80,16 @@ def create_subd_df(
 
     if window_x_day * 24 * 4 - len(df_x["global_date"].unique()) > allowed_error*window_x_day :
 
-        print(
-            "We do not have all the dates for the time period in x , {} {}".format(
-                window_x_day * 24 * 4, len(df_x["global_date"].unique())
-            )
-        )
+        # print(
+        #     "We do not have all the dates for the time period in x , {} {}".format(
+        #         window_x_day * 24 * 4, len(df_x["global_date"].unique())
+        #     )
+       # )
         return None, None
 
     if window_label_day*24*4 - len(df_label["global_date"].unique()) > allowed_error*window_label_day :
-        print("We do not have all the dates for the time period in label , {} {}".format(window_label_day*24*4,
-                                                                                     len(df_label["global_date"].unique())))
+        # print("We do not have all the dates for the time period in label , {} {}".format(window_label_day*24*4,
+        #                                                                              len(df_label["global_date"].unique())))
         return None, None
 
     ## filter and fill missing times
@@ -133,14 +133,14 @@ def create_global_batch(
     batch_df = pd.DataFrame(columns=columns_name)
     i = 0
     while first_day < end_period - timedelta(days=window_label_day + window_x_day):
-        print(
-            "Building batch {} \n x begin {} label begin {} end period {} ".format(
-                i,
-                first_day,
-                first_day + timedelta(days=window_x_day),
-                end_period - timedelta(days=window_label_day + window_x_day),
-            )
-        )
+       # print(
+        #    "Building batch {} \n x begin {} label begin {} end period {} ".format(
+        #        i,
+         #       first_day,
+         #       first_day + timedelta(days=window_x_day),
+         #       end_period - timedelta(days=window_label_day + window_x_day),
+         ##   )
+       # )
         df_x, df_y = create_subd_df(
             df,
             begin_day=first_day,

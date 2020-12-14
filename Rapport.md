@@ -74,23 +74,30 @@ Ensuite nous nous intéressons au volume moyen, par jour de la semaine, détect�
 <img src="image/Mean_volume_perday_2018.png">
 
 On agrège les données ayant la même exacte date d'acquisition.
-**insérer graph de image repertoire**
-**Analyser graph de image repertoire**
+**insérer graph de image Analyser graph de imagerepertoiree**
 
 #### Préparation des datasets
 
-Le traitement des données a été fait de manière à pouvoir choisir la taille des données (input) en entrée et à prédire (label). Les différentes possibilités de construction de dataset, nous mènent à attribuer un identifiant pour chaque dataset construit. Nous utiliserons cette notation lors de la présentation des résultats. Puisque nous ne possédions pas de ressource type gpu pour entrainer nos réseaux de neurones, nous avons délibéremment choisit de ne pas construire des datasets avec une forte variabilité de données : selection de données provenant d'un seul radar, de la même année, d'une même direction. 
+Le traitement des données a été fait de manière à pouvoir choisir la taille des données (input) en entrée et à prédire (label). Les différentes possibilités de construction de dataset, nous mènent à attribuer un identifiant pour chaque dataset construit. Nous utiliserons cette notation lors de la présentation des résultats. Puisque nous ne possédions pas de ressource type gpu pour entrainer nos réseaux de neurones, nous avons délibérément choisit de ne pas construire des datasets avec une forte variabilité de données : sélection de données provenant d'un seul radar, de la même année, d'une même direction. 
 
-| Identifiant du dataset | Nombre de radar | Direction | Taille total du dataset   | Taille input x en jour | Taille label y  |
-| ----------------- |  ----------------- | ----------- | ----------- | ----------- | ----------- |
-| Dataset0 | 1 | 1 | 1 an (2018) | 7 jours de données | 1 jours de données|
-|  |  |  | 1 an (2018) | 7 jours de données | 7 jours de données |
-|  |  |  | ** | 1 mois de données | 1 semaine de données |
-|                        |                 |           |                         |                        |                      |
+| Identifiant du dataset | Nombre de radar | Direction | Ecart maximale entre les données | Taille input x en jour | Taille label y  | Taille totale du dataset |
+| ----------------- |  ----------------- | ----------- | ----------- | ----------- | ----------- | ----------- |
+| Dataset0 | 1 | 1 | 1 an (2018) | 7 jours de données | 1 jours de données| |
+| Dataset1 | 1 | 1 | 4 mois (début 2018) | 7 jours de données | 1 jours de données | 42 |
+|  |  |  | ** | 1 mois de données | 1 semaine de données |  |
+|                        |                 |           |                         |                        |                      |                      |
 
 Puisque nous ne possédions pas de ressource type gpu pour entrainer nos réseaux de neurones, nous avons délibéremment choisit de ne pas construire des datasets avec une forte variabilité de données : selection de données provenant d'un seul radar, de la même année.  
 
-De plus comme 
+Enfin à partir ce ces datasets, juste avant l'entrainement nous les diviserons en trois sous datasets : entrainement, validation et test avec respectivement 80% , 5% et 15% des données.
+
+| Nom du dataset | Role                                                         |
+| -------------- | ------------------------------------------------------------ |
+| Entrainement   | Données sur lequel est entrainé le réseau de neurones        |
+| Validation     | Permet de régler le choix des hyperparamètres du réseau de neurones |
+| Test           | Données permettant d'établir les performances du modèle      |
+
+
 
 ### Réseaux de neurones utilisés
 
@@ -108,6 +115,12 @@ ce modèle a été facile à implémenter et à tester, cependant il manque de f
 
 Nous avons cherché à étudier un second modèle encodeur décodeur ou *seq2seq* qui correspond à la concaténation de deux modèles : un modèle encodeur et un modèle décodeur
 
+<img src="image/encoder_decoder.png">
+
+[Image de *Video Prediction using Deep Learning and PyTorch (-lightning)* article](https://towardsdatascience.com/video-prediction-using-convlstm-with-pytorch-lightning-27b195fd21a2)
+
+
+
 ##### Modèle encodeur
 
 Le modèle encodeur encode une séquence en un vecteur de longueur fixe. Ce modèle est constitué d'une succession de blocs récurent, dans notre cas des blocs LSTM. Chaque "bloc" prend en entrée un élément de la séquence et le propage. Le *hidden state* à chaque t est calculée de la manière suivante: 
@@ -124,25 +137,23 @@ Le modèle décodeur décode un vecteur de longueur fixe et prédit une séquenc
 
 ##### Teacher forcing
 
-Il peut être difficile d'entrainer un modèle seq2seq*, car initiallement les prédictions faites par chacun des blocs du décodeur sont non précises, et sont prises en compte pour la prédiction du blocs suivant. 
+Il peut être difficile d'entrainer un modèle *seq2seq*, car initiallement les prédictions faites par chacun des blocs du décodeur sont non précises, et sont prises en compte pour la prédiction du blocs suivant. 
 
-Pour faciliter la convergence du modèle lors de l'entrainement, la méthode de *teacher forcing* peut petre utilisé.  Au sein du décodeur, au lieu d'utiliser la prédiction du blocs précédent (prédiction à t-1) pour calculer une sortie à t, la valeur de la vérité terrain à t-1 est utilisée. 
+Pour faciliter la convergence du modèle lors de l'entrainement, la méthode de *teacher forcing* peut être utilisé.  Au sein du décodeur, au lieu d'utiliser la prédiction du blocs précédent (prédiction à t-1) pour calculer une sortie à t, la valeur de la vérité terrain à t-1 est utilisée. 
 
-<img src="image/encoder_decoder.png">
+<img src="image/teacher_forcing.png" alt="teacher_forcing" style="zoom:50%;" />
 
-[Image de *Video Prediction using Deep Learning and PyTorch (-lightning)* article](https://towardsdatascience.com/video-prediction-using-convlstm-with-pytorch-lightning-27b195fd21a2)
+[Translation or Answering tool: seq2seq with teacher forcing and attention mechanism](https://medium.com/@vivekvscool/translation-or-answer-tool-seq2seq-with-teacher-forcing-and-attention-mechanism-7cfd9cb03b3a)
 
 
 
 ##### Ajout de features
 
+Pour le moment tous les modèles que nous avons choisit ne prennent qu'en entrée les données *Volumes* temporelles du jeux de données. Il existent des modèles encodeur-décodeur où il est possible d'ajouter des features afin de rendre les prédictions plus précises. 
 
+Par exemple, nous avons remarqué lors de l'analyse des données que le Volume de voiture variait en fonction du jour de la semaine. Ainsi rajouter ces informations lors du features d'entrée pourraient améliorer la précision du modèle. 
 
-Pour le moment tous les modèles que nous avons choisit ne prennent qu'en entrée les données Volumes temporelles. Il existent des modèles encodeur, décodeur où il est possible d'ajouter des features afin de rendre les prédictions plus précises. 
-
-Par exemple, nous avons remarqué lors de l'analyse des données que le Volume de voiture variait en fonction du jour de la semaine. Ainsi rajouter ces informations lors du features d'entrée pourraient être améliorer la précision du modèle. 
-
-En ajoutant des features,  comme le jour de la semaine, il sera possible de diminuer la taille des données d'entrée en nombre de ligne par exemple. On pourra faire une séquence d'entrée avec d'un jour et souhaiter prédire le jour suivant par exemple. 
+En ajoutant des features,  comme le jour de la semaine, il sera par exemple probablement possible de diminuer la taille des données d'entrée (en nombre de données temporelles).  Il est également possible de penser qu'avec un modèle prenant en compte les features, le modèle pourra s'entrainer et prédire correctement sur des données provenant de radar différents, si la variable qualitative *nom du radar* est pris en compte en entrée du réseau. 
 
 <img src="image/encode_decoder_features.png">
 
@@ -206,7 +217,7 @@ Pour le bayesian lstm, je parlerai de mon loss (mse et sampler) dans ma partie -
 
 ## Résultats
 
-Nos ressources en calcul étant limité, nous sommes conscient que nous avons souvent pratiqué l'*early stopping*, car nous ne pouvions pas forcément nous permettre de passer autant de temps à entrainer un réseau de neurones.
+Nos ressources en calcul étant limité, nous sommes conscient que nous avons de temps en temps pratiqué l'*early stopping*, car nous ne pouvions pas forcément nous permettre de passer autant de temps à entrainer un réseau de neurones.
 
 #### Bayesian LSTM
 
@@ -234,7 +245,53 @@ Les résultats sont intéressants du fait de la visualisation du l'intervalle de
 
 <img src="image/image_interval_bayesian.png">
 
-## Résultats et analyse
+### LSTM simple
+
+Nous avons entrainé le model simple sur le Dataset0 décrit précédemment en faisant varier le learning rate    entre les valeurs suivantes : 0.05, 0.001 et 0.01.
+
+En étudiant la variation de loss pour ces différents learning rate, nous avons remarqué que l'entrainement ne semble converger que pour un learning rate de 0.001.
+
+Lors de l'entrainement du modèle LSTM simple, avec  un learning rate de 0.001 et pour 700 epochs, nous obtenons l'évolution de la loss mse suivante. 
+
+![](image/train_simple_model.png)
+
+​													*Variation de la loss pour LSTM simple*
+
+Nous avons également visualisé les prédictions effectué par ce modèle :
+
+ <img src="image/test_simple_model.png" style="zoom:80%;" />  <img src="image/test2_simple_model.png" alt="test2_simple_model" style="zoom:80%;" />
+
+​			<u>Prédictions simple-model LSTM sur le dataset de test de Dataset0</u>
+
+### Encodeur-décodeur
+
+L'entrainement de ce réseau de neurones a été particulièrement difficile et couteux en temps. L'entrainement étant long, nous avons travaillé avec un petit dataset pour ce réseau : le Dataset1, décrit dans la section *préparation des datasets*. Rapidement le réseaux de neurone ne produit qu'une seule et même prédiction, peut importe les données d'entrée. La méthode de teacher forcing ainsi que la modification du learning rate pour des valeurs entre 0.001 et 0.01 n'ont pas résolu ce problème.
+
+
+
+<img src="image/test_encoder_decoder.png" alt="test_encoder_decoder" style="zoom:75%;" /><img src="image/test_encoder_decoder.png" alt="test_encoder_decoder" style="zoom:75%;" />
+
+​									<u>Prédictions de encoder-decoder sur le dataset de Test de dataset1</u> 
+
+
+
+**Insérer graphique et prédictions**
+
+Puisque les résultats sans features n'étaient pas satisfaisant et le temps d'entrainement lent (30 minutes pour 100 epochs) , nous n'avons pas cherché à complexifier le modèle avec des features et à l'entrainer.
+
+## Discussion
+
+Puisque nous ne possédions pas de ressources réellement suffisantes nous sommes conscient que les résultats ne sont pas réellement représentatifs de ce que ces modèles pourrait prédire en réalité. Par exemple, les performances décevantes du modèle encodeur décodeur peuvent s'explique par le faible nombre d'epoch utilisé pour l'entrainement. De plus, le temps d'entrainement des réseaux limitent également la recherche d'hyper-paramètre. Quelques essais de variations du learning rate ont été fait, mais il aurait pu être intéressant pour chaque modèle de faire varier le taille du vecteur *hidden state* et  le nombre de couche LSTM utilisé. 
+
+### Simple LSTM model
+
+L'étude de la variation de loss pour le simple LSTM model, montre bien un phase d'aprentissage. Nous avons une décroissance de la loss pour le dataset de train et de validation avec l'atteinte d'un potentiel plateau.
+
+De plus, l'observation des prédictions montre une certaine cohérence avec la vérité terrain. Cependant, la valeur de la loss dans le dataset d'entrainement étant bien plus faible que pour le dataset de validation.  La visualisation des prédictions sur les données d'entrainement ne montre pas cependant une situation d'overfitting. Il aurait peut être été interessant de laisser l'entrainement se faire sur un plus grande nombre d'epoch. 
+
+### Encodeur-décodeur
+
+Les résultats obtenus avec le modèle encodeur-decodeur actuel ne sont pas réellement satisfaisant, puisque non représentatif de la réalité. Le fait que le réseau à un moment de donne qu'une seule prédiction peut s'explique pour différentes raison
 
 ## Conclusion
 

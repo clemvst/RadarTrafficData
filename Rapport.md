@@ -220,7 +220,7 @@ L'entrainement de ce réseau de neurones a été particulièrement difficile et 
 
 <img src="image/test_encoder_decoder.png" alt="test_encoder_decoder" style="zoom:75%;" /><img src="image/test_encoder_decoder.png" alt="test_encoder_decoder" style="zoom:75%;" />
 
-​													<u>Prédictions de encoder-decoder sur le dataset de Test de dataset1</u> 
+​									<u>Prédictions de encoder-decoder sur le dataset de Test de dataset1</u> 
 
 
 
@@ -230,13 +230,13 @@ Puisque les résultats sans features n'étaient pas satisfaisant et le temps d'e
 
 ## Discussion
 
-Puisque nous ne possédions pas de ressources réellement suffisantes nous sommes conscient que les résultats ne sont pas réellement représentatifs de ce que ces modèles pourrait prédire en réalité. Par exemple les performances décevantes du modèle encodeur décodeur peuvent s'explique par le faible nombre d'epoch utilisé pour l'entrainement. 
+Puisque nous ne possédions pas de ressources réellement suffisantes nous sommes conscient que les résultats ne sont pas réellement représentatifs de ce que ces modèles pourrait prédire en réalité. Par exemple, les performances décevantes du modèle encodeur décodeur peuvent s'explique par le faible nombre d'epoch utilisé pour l'entrainement. De plus, le temps d'entrainement des réseaux limitent également la recherche d'hyper-paramètre. Quelques essais de variations du learning rate ont été fait, mais il aurait pu être intéressant pour chaque modèle de faire varier le taille du vecteur *hidden state* et  le nombre de couche LSTM utilisé. 
 
 ### Simple LSTM model
 
 L'étude de la variation de loss pour le simple LSTM model, montre bien un phase d'aprentissage. Nous avons une décroissance de la loss pour le dataset de train et de validation avec l'atteinte d'un potentiel plateau.
 
-De plus, l'observation des prédictions montre une certaine cohérence avec la vérité terrain. Cependant, la valeur de la loss dans le dataset d'entrainement étant bien plus faible que pour le dataset de validation. Il 
+De plus, l'observation des prédictions montre une certaine cohérence avec la vérité terrain. Cependant, la valeur de la loss dans le dataset d'entrainement étant bien plus faible que pour le dataset de validation.  La visualisation des prédictions sur les données d'entrainement ne montre pas cependant une situation d'overfitting. Il aurait peut être été interessant de laisser l'entrainement se faire sur un plus grande nombre d'epoch. 
 
 ### Encodeur-décodeur
 

@@ -208,7 +208,7 @@ Lors de l'entrainement du modèle LSTM simple, avec  un learning rate de 0.001 e
 
 Nous avons également visualisé les prédictions effectué par ce modèle :
 
- <img src="/Users/iris/Code/RadarTrafficData/image/test_simple_model.png" style="zoom:80%;" />  <img src="/Users/iris/Code/RadarTrafficData/image/test2_simple_model.png" alt="test2_simple_model" style="zoom:80%;" />
+ <img src="image/test_simple_model.png" style="zoom:80%;" />  <img src="image/test2_simple_model.png" alt="test2_simple_model" style="zoom:80%;" />
 
 ​			<u>Prédictions simple-model LSTM sur le dataset de test de Dataset0</u>
 
@@ -216,9 +216,9 @@ Nous avons également visualisé les prédictions effectué par ce modèle :
 
 L'entrainement de ce réseau de neurones a été particulièrement difficile et couteux en temps. L'entrainement étant long, nous avons travaillé avec un petit dataset pour ce réseau : le Dataset1, décrit dans la section *préparation des datasets*. Rapidement le réseaux de neurone ne produit qu'une seule et même prédiction, peut importe les données d'entrée. La méthode de teacher forcing ainsi que la modification du learning rate pour des valeurs entre 0.001 et 0.01 n'ont pas résolu ce problème.
 
-<img src="/Users/iris/Code/RadarTrafficData/image/test_encoder_decoder.png" alt="test_encoder_decoder" style="zoom:75%;" />
 
-<img src="/Users/iris/Code/RadarTrafficData/image/test_encoder_decoder.png" alt="test_encoder_decoder" style="zoom:75%;" />
+
+<img src="image/test_encoder_decoder.png" alt="test_encoder_decoder" style="zoom:75%;" /><img src="image/test_encoder_decoder.png" alt="test_encoder_decoder" style="zoom:75%;" />
 
 ​													<u>Prédictions de encoder-decoder sur le dataset de Test de dataset1</u> 
 
